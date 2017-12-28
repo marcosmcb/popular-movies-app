@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.Scanner;
 
 
 /**
@@ -21,8 +23,10 @@ public class NetworkUtils {
     private static final String sAPI_BASE_URI        =  "https://api.themoviedb.org/3/movie/";
     private static final String sTOP_RATED_ENDPOINT  =  "top_rated";
     private static final String sPOPULAR_ENDPOINT    =  "popular";
-    private static final String sAPI_KEY             =  "?api_key=";
-    private static final String sLANGUAGE            =  "&language=en-US";
+    private static final String sQUERYPARAM          =  "?";
+    private static final String sAPI_KEY             =  "api_key";
+    private static final String sLANGUAGE            =  "language";
+    private static final String sENGLISH             =  "en-US";
     private Context context;
     private PropertyUtils properties;
 
@@ -53,7 +57,7 @@ public class NetworkUtils {
                 .appendPath( sAPI_KEY + propertyUtils.getApiKey() )
                 .build();
 
-        URL url = null;
+        URL url = new URL(builtUri.toString());
 
         Log.v(TAG, "Built URI TopRated = " + url);
 
@@ -70,17 +74,42 @@ public class NetworkUtils {
 
         PropertyUtils propertyUtils = new PropertyUtils(true, context);
 
-        Uri builtUri = Uri.parse( sAPI_BASE_URI )
-                .buildUpon()
-                .appendPath( sPOPULAR_ENDPOINT )
-                .appendPath( sAPI_KEY + propertyUtils.getApiKey() )
+        Uri builtUri = Uri.parse( sAPI_BASE_URI + sPOPULAR_ENDPOINT ).buildUpon()
+                .appendQueryParameter( sAPI_KEY, propertyUtils.getApiKey() )
+                .appendQueryParameter( sLANGUAGE, sENGLISH )
                 .build();
 
-        URL url = null;
+        URL url = new URL(builtUri.toString());
 
         Log.v(TAG, "Built URI PopularMovies = " + url);
 
         return url;
+    }
+
+    /**
+     * This method returns the entire result from the HTTP response.
+     *
+     * @param url The URL to fetch the HTTP response from.
+     * @return The contents of the HTTP response.
+     * @throws IOException Related to network and stream reading
+     */
+    public String getResponseFromHttpUrl(URL url) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try {
+            InputStream in = urlConnection.getInputStream();
+
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
+
+            boolean hasInput = scanner.hasNext();
+            if (hasInput) {
+                return scanner.next();
+            } else {
+                return null;
+            }
+        } finally {
+            urlConnection.disconnect();
+        }
     }
 
 
