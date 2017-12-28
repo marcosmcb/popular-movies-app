@@ -5,7 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
+import com.example.marcoscavalcante.popularmovies.utils.PropertyUtils;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,7 +19,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NetworkUtils network = new NetworkUtils( getApplicationContext() );
+
+        TextView tv_test = (TextView) findViewById(R.id.debug_tv);
+
+        try {
+            tv_test.setText( network.getKeyValue() );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
