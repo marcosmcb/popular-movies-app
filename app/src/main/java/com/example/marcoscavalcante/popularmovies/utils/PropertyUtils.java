@@ -63,7 +63,7 @@ public class PropertyUtils
         }
         finally
         {
-            //input.close();
+            input.close();
         }
 
     }
