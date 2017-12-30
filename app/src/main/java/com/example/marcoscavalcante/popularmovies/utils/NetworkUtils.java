@@ -16,9 +16,12 @@ import java.util.Scanner;
  * Created by marcoscavalcante on 07/11/2017.
  */
 
-public class NetworkUtils {
+public class NetworkUtils
+{
 
-    private static final String TAG = NetworkUtils.class.getSimpleName();
+    private static final boolean IS_DEBUG            = true;
+
+    private static final String TAG                  = NetworkUtils.class.getSimpleName();
 
     private static final String sAPI_BASE_URI        =  "https://api.themoviedb.org/3/movie/";
     private static final String sTOP_RATED_ENDPOINT  =  "top_rated";
@@ -27,11 +30,12 @@ public class NetworkUtils {
     private static final String sAPI_KEY             =  "api_key";
     private static final String sLANGUAGE            =  "language";
     private static final String sENGLISH             =  "en-US";
+
+    private static final String sPOSTER_BASE_URL     = "http://image.tmdb.org/t/p/";
+
+
     private Context context;
     private PropertyUtils properties;
-
-    private enum SIZE { w92, w154, w185, w342, w500, w780, original }
-
 
     public NetworkUtils( Context context )
     {
@@ -47,14 +51,14 @@ public class NetworkUtils {
      *
      * @return The URL to use to query the weather server.
      */
-    public URL getUrlTopRated( ) throws MalformedURLException, IOException {
+    public URL getUrlTopRated( ) throws MalformedURLException, IOException
+    {
 
-        PropertyUtils propertyUtils = new PropertyUtils( true, context );
+        PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context );
 
-        Uri builtUri = Uri.parse( sAPI_BASE_URI )
-                .buildUpon()
-                .appendPath( sTOP_RATED_ENDPOINT )
-                .appendPath( sAPI_KEY + propertyUtils.getApiKey() )
+        Uri builtUri = Uri.parse( sAPI_BASE_URI + sTOP_RATED_ENDPOINT ).buildUpon()
+                .appendQueryParameter( sAPI_KEY, propertyUtils.getApiKey() )
+                .appendQueryParameter( sLANGUAGE, sENGLISH )
                 .build();
 
         URL url = new URL(builtUri.toString());
@@ -70,9 +74,10 @@ public class NetworkUtils {
      *
      * @return The URL to use to query the weather server.
      */
-    public URL getUrlPopularMovies( ) throws MalformedURLException, IOException {
+    public URL getUrlPopularMovies( ) throws MalformedURLException, IOException
+    {
 
-        PropertyUtils propertyUtils = new PropertyUtils(true, context);
+        PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context);
 
         Uri builtUri = Uri.parse( sAPI_BASE_URI + sPOPULAR_ENDPOINT ).buildUpon()
                 .appendQueryParameter( sAPI_KEY, propertyUtils.getApiKey() )
@@ -84,6 +89,12 @@ public class NetworkUtils {
         Log.v(TAG, "Built URI PopularMovies = " + url);
 
         return url;
+    }
+
+    public static String getPosterUrl( String path, Size size )
+    {
+        Uri builtUri = Uri.parse( sPOSTER_BASE_URL + size.toString() + path ).buildUpon().build();
+        return builtUri.toString();
     }
 
     /**
@@ -110,13 +121,6 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
-    }
-
-
-    public String getKeyValue () throws IOException
-    {
-        PropertyUtils propertyUtils = new PropertyUtils(true, context);
-        return propertyUtils.getApiKey() + " came from NetworkClass!!!";
     }
 
 
