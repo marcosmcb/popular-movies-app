@@ -26,7 +26,7 @@ public class Movie
     private String backdropPath;
     private boolean isAdult;
     private String overview;
-    private Date releaseDate;
+    private String releaseDate;
     private JSONObject movieJson;
 
     public Movie(JSONObject movie) throws JSONException, ParseException
@@ -43,7 +43,7 @@ public class Movie
         this.backdropPath       = movie.getString("backdrop_path");
         this.isAdult            = movie.getBoolean("adult");
         this.overview           = movie.getString("overview");
-        this.releaseDate        = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH).parse(movie.getString("release_date"));
+        this.releaseDate        = movie.getString("release_date");
         this.movieJson          = movie;
     }
 
@@ -144,11 +144,11 @@ public class Movie
         this.overview = overview;
     }
 
-    public Date getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 

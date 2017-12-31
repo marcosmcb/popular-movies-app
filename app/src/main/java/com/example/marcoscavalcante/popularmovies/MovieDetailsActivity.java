@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.ParseException;
 
@@ -24,9 +25,11 @@ public class MovieDetailsActivity extends AppCompatActivity
 {
 
     /* Field to store our TextView */
-    private TextView mTitleMovie;
     private ImageView mPoster;
+    private TextView mTitleMovie;
     private TextView mOverview;
+    private TextView mReleaseDate;
+    private TextView mVoteAverage;
     private Movie mMovie;
 
     @Override
@@ -35,10 +38,12 @@ public class MovieDetailsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
 
+        mPoster         = (ImageView) findViewById(R.id.iv_poster_details);
 
-        mTitleMovie = (TextView)  findViewById(R.id.tb_tv_title_details);
-        mPoster     = (ImageView) findViewById(R.id.iv_poster_details);
-        mOverview   = (TextView)  findViewById(R.id.tv_overview_details);
+        mTitleMovie     = (TextView) findViewById(R.id.tb_tv_title_details);
+        mOverview       = (TextView) findViewById(R.id.tv_overview_details);
+        mReleaseDate    = (TextView) findViewById(R.id.tv_release_date_details);
+        mVoteAverage    = (TextView) findViewById(R.id.tv_vote_average_details);
 
         Intent movieDetails = getIntent();
 
@@ -50,10 +55,15 @@ public class MovieDetailsActivity extends AppCompatActivity
                 JSONObject movieJsonObject = new JSONObject( movieDetails.getStringExtra("movie"));
                 mMovie = new Movie( movieJsonObject );
 
+                String releaseDate = mMovie.getReleaseDate().substring(0,4);
+                String posterPath   =  NetworkUtils.getPosterUrl( mMovie.getPosterPath(), Size.w342 );
+
                 mTitleMovie.setText( mMovie.getTitle() );
                 mOverview.setText( mMovie.getOverview() );
+                mVoteAverage.setText( mMovie.getVoteAverage().toString() + '/' + getString(R.string.max_vote_average) );
+                mReleaseDate.setText( releaseDate );
 
-                String posterPath   =  NetworkUtils.getPosterUrl( mMovie.getPosterPath(), Size.w342 );
+
 
                 Picasso.with( this ).load( posterPath ).into( mPoster );
 
