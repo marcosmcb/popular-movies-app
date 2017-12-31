@@ -81,12 +81,19 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setAdapter( mMovieAdapter );
 
+        try
+        {
+            makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void showJsonDataView( )
     {
         mErrorMessage.setVisibility(View.INVISIBLE);
-        // Show movies wherever I need to
     }
 
     private void showErrorMessage( )
@@ -100,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             mLoadingIndicator.setVisibility(View.VISIBLE);
+            showJsonDataView();
         }
 
         @Override
@@ -126,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             if( rawContent != null && !rawContent.equals("") )
             {
+                showJsonDataView();
                 try
                 {
                     JSONObject jsonObject = new JSONObject(rawContent);
