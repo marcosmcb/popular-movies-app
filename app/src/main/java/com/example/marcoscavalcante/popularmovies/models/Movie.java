@@ -27,6 +27,7 @@ public class Movie
     private boolean isAdult;
     private String overview;
     private Date releaseDate;
+    private JSONObject movieJson;
 
     public Movie(JSONObject movie) throws JSONException, ParseException
     {
@@ -43,26 +44,9 @@ public class Movie
         this.isAdult            = movie.getBoolean("adult");
         this.overview           = movie.getString("overview");
         this.releaseDate        = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH).parse(movie.getString("release_date"));
+        this.movieJson          = movie;
     }
 
-    public Movie(int voteCount, int id, boolean hasVideo, Double voteAverage, String title,
-                 Double popularity, String posterPath, String originalLanguage, String originalTitle,
-                 String backdropPath, boolean isAdult, String overview, Date releaseDate)
-    {
-        this.voteCount = voteCount;
-        this.id = id;
-        this.hasVideo = hasVideo;
-        this.voteAverage = voteAverage;
-        this.title = title;
-        this.popularity = popularity;
-        this.posterPath = posterPath;
-        this.originalLanguage = originalLanguage;
-        this.originalTitle = originalTitle;
-        this.backdropPath = backdropPath;
-        this.isAdult = isAdult;
-        this.overview = overview;
-        this.releaseDate = releaseDate;
-    }
 
     public int getVoteCount() {
         return voteCount;
@@ -168,5 +152,13 @@ public class Movie
         this.releaseDate = releaseDate;
     }
 
+
+    public JSONObject getMovieJson() {
+        return movieJson;
+    }
+
+    public void setMovieJson(JSONObject movieJson) {
+        this.movieJson = movieJson;
+    }
 
 }

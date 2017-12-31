@@ -1,6 +1,7 @@
 package com.example.marcoscavalcante.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -60,8 +61,24 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         mMovies = new ArrayList<>();
-
         mMovieAdapter = new MovieAdapter( mMovies );
+
+        mMovieAdapter.setOnEntryClickListener(new MovieAdapter.OnEntryClickListener()
+        {
+            @Override
+            public void onEntryClick(View view, int position)
+            {
+                Class movieDetails = MovieDetailsActivity.class;
+                Intent startMovieDetailsActivityIntent = new Intent(MainActivity.this, movieDetails);
+
+                String movieJson = mMovies.get(position).getMovieJson().toString();
+                startMovieDetailsActivityIntent.putExtra("movie", movieJson );
+
+
+                startActivity(startMovieDetailsActivityIntent);
+            }
+        });
+
         mRecyclerView.setAdapter( mMovieAdapter );
 
     }
@@ -144,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
     {
         URL movieDbQueryUrl;
         String popularMovies = getString( R.string.sort_most_popular );
+        mMovies.clear();
 
         if( param.equals(popularMovies) )
         {
