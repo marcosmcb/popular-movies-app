@@ -1,6 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MovieDetailsActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <Toolbar
+        android:id="@+id/tb_title_details"
+        android:background="#20a7a7"
+        android:layout_width="match_parent"
+        android:layout_height="75dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="32sp"
+            android:textColor="#ffffff"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/tb_tv_title_details" />
+
+    </Toolbar>
+
+    <ScrollView
+        android:layout_below="@id/tb_title_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <FrameLayout
+            android:layout_below="@id/tb_title_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_poster_details"
+                android:layout_margin="5dp"
+                android:layout_width="220dp"
+                android:layout_height="250dp" />
+
+
+            <TextView
+                android:id="@+id/tv_release_date_details"
+                android:paddingLeft="230dp"
+                android:paddingTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="34sp"/>
+
+            <TextView
+                android:id="@+id/tv_vote_average_details"
+                android:paddingLeft="230dp"
+                android:paddingTop="75dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/tv_overview_details"
+                android:paddingLeft="5dp"
+                android:paddingTop="300dp"
+                android:layout_margin="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"/>
+
+        </FrameLayout>
+    </ScrollView>
+
+</RelativeLayout>
