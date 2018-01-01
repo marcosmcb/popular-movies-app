@@ -41,7 +41,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public MovieAdapter( ArrayList<Movie> movies )
     {
         this.mMovies  = movies;
-        this.viewHolderCount = 0;
+        viewHolderCount = 0;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         Context context     = holder.itemView.getContext();
         View view           = holder.itemView;
 
-        ImageView imageView = (ImageView) view.findViewById( R.id.ivMoviePoster );
+        ImageView imageView = view.findViewById( R.id.ivMoviePoster );
         String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.w185 );
 
         Picasso.with( context ).load( posterPath ).into( imageView );
@@ -85,7 +85,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         {
             super(itemView);
             itemView.setOnClickListener( this );
-            moviePosterView = (ImageView) itemView.findViewById(R.id.ivMoviePoster);
+            moviePosterView = itemView.findViewById(R.id.ivMoviePoster);
         }
 
 

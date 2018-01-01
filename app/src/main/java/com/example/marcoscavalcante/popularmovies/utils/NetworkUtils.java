@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class NetworkUtils
 {
 
-    private static final boolean IS_DEBUG            = false;
+    private static final boolean IS_DEBUG            = true;
 
     private static final String TAG                  = NetworkUtils.class.getSimpleName();
 
@@ -51,7 +51,7 @@ public class NetworkUtils
      *
      * @return The URL to use to query the weather server.
      */
-    public URL getUrlTopRated( ) throws MalformedURLException, IOException
+    public URL getUrlTopRated( ) throws IOException
     {
 
         PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context );
@@ -74,7 +74,7 @@ public class NetworkUtils
      *
      * @return The URL to use to query the weather server.
      */
-    public URL getUrlPopularMovies( ) throws MalformedURLException, IOException
+    public URL getUrlPopularMovies( ) throws IOException
     {
 
         PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context);
