@@ -2,6 +2,7 @@ package com.example.marcoscavalcante.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridLayoutManager;
 
-    private static final int NUM_COLUMNS = 2;
+    private static final int NUM_COLUMNS_PORTRAIT  = 2;
+    private static final int NUM_COLUMNS_LANDSCAPE = 4;
 
 
     @Override
@@ -49,13 +51,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mNetworkUtils     = new NetworkUtils( getApplicationContext() );
-        mErrorMessage     = (TextView) findViewById(R.id.error_message);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mErrorMessage     = findViewById(R.id.error_message);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
-        mRecyclerView = (RecyclerView) findViewById( R.id.rv_movies );
+        mRecyclerView = findViewById( R.id.rv_movies );
 
-        mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS);
-
+        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_PORTRAIT);
+        }
+        else
+        {
+            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_LANDSCAPE);
+        }
 
         mRecyclerView.setLayoutManager( mGridLayoutManager );
         mRecyclerView.setHasFixedSize(true);

@@ -4,11 +4,12 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-
+5
     <ImageView
         android:id="@+id/ivMoviePoster"
+        android:adjustViewBounds="true"
         android:layout_margin="2dp"
-        android:layout_width="200dp"
-        android:layout_height="300dp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
