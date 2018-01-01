@@ -72,7 +72,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         View view           = holder.itemView;
 
         ImageView imageView = view.findViewById( R.id.ivMoviePoster );
-        String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.w185 );
+        String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.original );
 
         Picasso.with( context ).load( posterPath ).into( imageView );
     }
