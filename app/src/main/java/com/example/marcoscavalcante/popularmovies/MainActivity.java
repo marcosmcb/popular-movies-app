@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
 {
-
     private NetworkUtils mNetworkUtils;
     private TextView mTestMessage;
     private TextView mErrorMessage;
@@ -47,24 +46,18 @@ public class MainActivity extends AppCompatActivity
         mNetworkUtils     = new NetworkUtils( getApplicationContext() );
         mErrorMessage     = findViewById(R.id.error_message);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mMovies           = new ArrayList<>();
+        mMovieAdapter     = new MovieAdapter( mMovies );
+        mRecyclerView     = findViewById( R.id.rv_movies );
 
-        mRecyclerView = findViewById( R.id.rv_movies );
+        setMovieAdapterListener();
+        setGridLayoutManager();
+        setRecyclerView();
+        callAsyncTask();
+    }
 
-        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-        {
-            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_PORTRAIT);
-        }
-        else
-        {
-            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_LANDSCAPE);
-        }
-
-        mRecyclerView.setLayoutManager( mGridLayoutManager );
-        mRecyclerView.setHasFixedSize(true);
-
-        mMovies = new ArrayList<>();
-        mMovieAdapter = new MovieAdapter( mMovies );
-
+    private void setMovieAdapterListener( )
+    {
         mMovieAdapter.setOnEntryClickListener(new MovieAdapter.OnEntryClickListener()
         {
             @Override
@@ -80,9 +73,17 @@ public class MainActivity extends AppCompatActivity
                 startActivity(startMovieDetailsActivityIntent);
             }
         });
+    }
 
+    private void setRecyclerView( )
+    {
+        mRecyclerView.setLayoutManager( mGridLayoutManager );
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter( mMovieAdapter );
+    }
 
+    private void callAsyncTask( )
+    {
         try
         {
             makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
@@ -90,6 +91,18 @@ public class MainActivity extends AppCompatActivity
         catch (IOException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void setGridLayoutManager()
+    {
+        if( this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT )
+        {
+            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_PORTRAIT);
+        }
+        else
+        {
+            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_LANDSCAPE);
         }
     }
 
