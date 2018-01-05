@@ -1,9 +1,7 @@
 package com.example.marcoscavalcante.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,16 +16,13 @@ import android.widget.Toast;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity
+{
 
     private NetworkUtils mNetworkUtils;
     private TextView mTestMessage;
@@ -42,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_COLUMNS_PORTRAIT  = 2;
     private static final int NUM_COLUMNS_LANDSCAPE = 4;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -99,79 +93,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showJsonDataView( )
+    public void showJsonDataView( )
     {
         mErrorMessage.setVisibility(View.INVISIBLE);
     }
 
-    private void showErrorMessage( )
+    public void showErrorMessage( )
     {
         mErrorMessage.setVisibility(View.VISIBLE);
-    }
-
-    public class TheMovieDBTask extends AsyncTask<URL, Void, String>
-    {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-            showJsonDataView();
-        }
-
-        @Override
-        protected String doInBackground(URL... urls)
-        {
-            URL queryUrl = urls[0];
-            String theMovieDbResults =  null;
-
-            try
-            {
-                theMovieDbResults = mNetworkUtils.getResponseFromHttpUrl( queryUrl );
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            return theMovieDbResults;
-        }
-
-        @Override
-        protected void onPostExecute(String rawContent)
-        {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if( rawContent != null && !rawContent.equals("") )
-            {
-                showJsonDataView();
-                try
-                {
-                    JSONObject jsonObject = new JSONObject(rawContent);
-                    JSONArray  jsonArray  = jsonObject.getJSONArray("results");
-
-                    for( int i=0; i < jsonArray.length(); i++ )
-                    {
-                        JSONObject movieJson = jsonArray.getJSONObject(i);
-                        mMovies.add( new Movie( movieJson ) );
-                    }
-
-                    mMovieAdapter.notifyDataSetChanged();
-                }
-                catch(JSONException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (ParseException e)
-                {
-                    e.printStackTrace();
-                }
-
-
-            }
-            else
-            {
-                showErrorMessage();
-            }
-        }
     }
 
     private void makeTheMovieDBQuery( String param ) throws IOException
@@ -189,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             movieDbQueryUrl = mNetworkUtils.getUrlTopRated();
         }
 
-        new TheMovieDBTask().execute( movieDbQueryUrl );
+        new TheMovieDBTask( this ).execute( movieDbQueryUrl );
     }
 
 
@@ -204,29 +133,22 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item)
     {
         int menuItemThatWasSelected = item.getItemId();
-        Context context;
-        String message;
 
         switch( menuItemThatWasSelected )
         {
             case R.id.action_sort_most_popular:
-                context = MainActivity.this;
-                // message = "most popular clicked";
-                // Toast.makeText( context, message, Toast.LENGTH_LONG ).show();
                 try
                 {
                     makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
                 }
-                catch (IOException e) {
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
                 break;
 
 
             case R.id.action_sort_top_rated:
-                context = MainActivity.this;
-//                message = "top popular clicked";
-//                Toast.makeText( context, message, Toast.LENGTH_LONG ).show();
                 try
                 {
                     makeTheMovieDBQuery( getString( R.string.sort_top_rated ) );
@@ -238,12 +160,77 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             default:
-                context = MainActivity.this;
-                message = "couldnt find selection!";
-                Toast.makeText( context, message, Toast.LENGTH_LONG ).show();
+                Toast.makeText( MainActivity.this,
+                                 getString(R.string.error_message_menu),
+                                 Toast.LENGTH_LONG ).show();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public NetworkUtils getmNetworkUtils() {
+        return mNetworkUtils;
+    }
+
+    public void setmNetworkUtils(NetworkUtils mNetworkUtils) {
+        this.mNetworkUtils = mNetworkUtils;
+    }
+
+    public TextView getmTestMessage() {
+        return mTestMessage;
+    }
+
+    public void setmTestMessage(TextView mTestMessage) {
+        this.mTestMessage = mTestMessage;
+    }
+
+    public TextView getmErrorMessage() {
+        return mErrorMessage;
+    }
+
+    public void setmErrorMessage(TextView mErrorMessage) {
+        this.mErrorMessage = mErrorMessage;
+    }
+
+    public ProgressBar getmLoadingIndicator() {
+        return mLoadingIndicator;
+    }
+
+    public void setmLoadingIndicator(ProgressBar mLoadingIndicator) {
+        this.mLoadingIndicator = mLoadingIndicator;
+    }
+
+    public ArrayList<Movie> getmMovies() {
+        return mMovies;
+    }
+
+    public void setmMovies(ArrayList<Movie> mMovies) {
+        this.mMovies = mMovies;
+    }
+
+    public MovieAdapter getmMovieAdapter() {
+        return mMovieAdapter;
+    }
+
+    public void setmMovieAdapter(MovieAdapter mMovieAdapter) {
+        this.mMovieAdapter = mMovieAdapter;
+    }
+
+    public RecyclerView getmRecyclerView() {
+        return mRecyclerView;
+    }
+
+    public void setmRecyclerView(RecyclerView mRecyclerView) {
+        this.mRecyclerView = mRecyclerView;
+    }
+
+    public GridLayoutManager getmGridLayoutManager() {
+        return mGridLayoutManager;
+    }
+
+    public void setmGridLayoutManager(GridLayoutManager mGridLayoutManager) {
+        this.mGridLayoutManager = mGridLayoutManager;
     }
 }
