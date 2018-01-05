@@ -47,7 +47,7 @@ public class MovieDetailsActivity extends AppCompatActivity
 
         Intent movieDetails = getIntent();
 
-        if ( movieDetails.hasExtra( "movie" ) )
+        if ( movieDetails != null && movieDetails.hasExtra( "movie" ) )
         {
 
             try
