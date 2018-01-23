@@ -1,6 +1,10 @@
 package com.example.marcoscavalcante.popularmovies;
 
+
 import android.content.Intent;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.content.res.Configuration;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>
 {
     private NetworkUtils mNetworkUtils;
     private TextView mTestMessage;
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final int NUM_COLUMNS_PORTRAIT  = 2;
     private static final int NUM_COLUMNS_LANDSCAPE = 4;
+    private static final int LOADER_MOVIES = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,7 +58,10 @@ public class MainActivity extends AppCompatActivity
         setMovieAdapterListener();
         setGridLayoutManager();
         setRecyclerView();
-        callAsyncTask();
+
+        getSupportLoaderManager().initLoader( LOADER_MOVIES, null, this);
+
+        callLoader();
     }
 
     private void setMovieAdapterListener( )
@@ -82,8 +90,21 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setAdapter( mMovieAdapter );
     }
 
-    private void callAsyncTask( )
+    private void callLoader( )
     {
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<String> movieLoader = loaderManager.getLoader(LOADER_MOVIES);
+
+        if( movieLoader == null )
+        {
+            loaderManager.initLoader( LOADER_MOVIES, null, this );
+        }
+        else
+        {
+            loaderManager.restartLoader( LOADER_MOVIES, null, this );
+        }
+
+        /*
         try
         {
             makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
@@ -92,6 +113,7 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        */
     }
 
     private void setGridLayoutManager()
@@ -211,7 +233,8 @@ public class MainActivity extends AppCompatActivity
         return mLoadingIndicator;
     }
 
-    public void setmLoadingIndicator(ProgressBar mLoadingIndicator) {
+    public void setmLoadingIndicator(ProgressBar mLoadingIndicator)
+    {
         this.mLoadingIndicator = mLoadingIndicator;
     }
 
@@ -243,7 +266,89 @@ public class MainActivity extends AppCompatActivity
         return mGridLayoutManager;
     }
 
-    public void setmGridLayoutManager(GridLayoutManager mGridLayoutManager) {
+    public void setmGridLayoutManager(GridLayoutManager mGridLayoutManager)
+    {
         this.mGridLayoutManager = mGridLayoutManager;
+    }
+
+    @Override
+    public Loader<String> onCreateLoader(int id, final Bundle args)
+    {
+        return new AsyncTaskLoader<String>(this)
+        {
+            String mMovieJson;
+
+            @Override
+            protected void onStartLoading()
+            {
+                if(args == null)
+                {
+                    return;
+                }
+
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+
+                if(mMovieJson != null)
+                {
+                    deliverResult(mMovieJson);
+                }
+                else
+                {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public String loadInBackground()
+            {
+                String searchQueryUrlString = args.getString( "" );
+
+                if( searchQueryUrlString == null || searchQueryUrlString.isEmpty() )
+                {
+                    return null;
+                }
+
+                try
+                {
+                    URL movieUrl = new URL( searchQueryUrlString );
+                    String movieSearchResults = NetworkUtils.getPosterUrl(null,null);
+                    return movieSearchResults;
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data)
+    {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+        if( data == null )
+        {
+            showErrorMessage();
+        }
+        else
+        {
+            //
+            showJsonDataView();
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String> loader)
+    {
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 }
