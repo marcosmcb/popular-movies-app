@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.marcoscavalcante.popularmovies.MainActivity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -26,7 +28,8 @@ public class NetworkUtils
     private static final String sAPI_BASE_URI        =  "https://api.themoviedb.org/3/movie/";
     private static final String sTOP_RATED_ENDPOINT  =  "top_rated";
     private static final String sPOPULAR_ENDPOINT    =  "popular";
-    private static final String sQUERYPARAM          =  "?";
+    private static final String sVIDEOS              =  "/videos";
+    private static final String sREVIEWS             =  "/reviews";
     private static final String sAPI_KEY             =  "api_key";
     private static final String sLANGUAGE            =  "language";
     private static final String sENGLISH             =  "en-US";
@@ -41,6 +44,8 @@ public class NetworkUtils
     {
         setContext( context );
     }
+
+    public NetworkUtils( ) { super(); };
 
     public void setContext( Context context)
     {
@@ -76,7 +81,6 @@ public class NetworkUtils
      */
     public URL getUrlPopularMovies( ) throws IOException
     {
-
         PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context);
 
         Uri builtUri = Uri.parse( sAPI_BASE_URI + sPOPULAR_ENDPOINT ).buildUpon()
@@ -90,6 +94,51 @@ public class NetworkUtils
 
         return url;
     }
+
+    /**
+     *
+     *
+     * @return The URL to use to query the traillers for a specific Movie
+     * */
+
+    public URL getMovieTraillers( int id ) throws IOException
+    {
+        PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context);
+
+        Uri builtUri = Uri.parse( sAPI_BASE_URI + id + sVIDEOS ).buildUpon()
+                .appendQueryParameter( sAPI_KEY, propertyUtils.getApiKey() )
+                .appendQueryParameter( sLANGUAGE, sENGLISH )
+                .build();
+
+        URL url = new URL(builtUri.toString());
+
+        Log.v(TAG, "Built URI MovieTraillers = " + url);
+
+        return url;
+    }
+
+    /**
+     *
+     *
+     * @return The URL to use to query the reviews for a specific Movie
+     * */
+
+    public URL getMovieReviews( int id ) throws IOException
+    {
+        PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context);
+
+        Uri builtUri = Uri.parse( sAPI_BASE_URI + id + sREVIEWS ).buildUpon()
+                .appendQueryParameter( sAPI_KEY, propertyUtils.getApiKey() )
+                .appendQueryParameter( sLANGUAGE, sENGLISH )
+                .build();
+
+        URL url = new URL(builtUri.toString());
+
+        Log.v(TAG, "Built URI MovieReviews = " + url);
+
+        return url;
+    }
+
 
     public static String getPosterUrl( String path, Size size )
     {
@@ -120,6 +169,18 @@ public class NetworkUtils
             }
         } finally {
             urlConnection.disconnect();
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        NetworkUtils net = new NetworkUtils( );
+
+        try
+        {
+            System.out.print( net.getUrlPopularMovies().toString() );
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
