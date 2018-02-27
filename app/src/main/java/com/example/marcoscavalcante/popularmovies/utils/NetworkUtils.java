@@ -2,6 +2,7 @@ package com.example.marcoscavalcante.popularmovies.utils;
 
 import android.content.Context;
 import android.net.Uri;
+import android.test.mock.MockContext;
 import android.util.Log;
 
 import com.example.marcoscavalcante.popularmovies.MainActivity;
@@ -53,12 +54,10 @@ public class NetworkUtils
     }
 
     /**
-     *
-     * @return The URL to use to query the weather server.
+     * @return The URL to use to query the MoviesDB Api and get the TopRated movies
      */
     public URL getUrlTopRated( ) throws IOException
     {
-
         PropertyUtils propertyUtils = new PropertyUtils( IS_DEBUG, context );
 
         Uri builtUri = Uri.parse( sAPI_BASE_URI + sTOP_RATED_ENDPOINT ).buildUpon()
@@ -75,9 +74,7 @@ public class NetworkUtils
 
 
     /**
-     *
-     *
-     * @return The URL to use to query the weather server.
+     * @return The URL to use to query the MoviesDB Api and get the MostPopular movies
      */
     public URL getUrlPopularMovies( ) throws IOException
     {
@@ -174,7 +171,7 @@ public class NetworkUtils
 
     public static void main(String[] args)
     {
-        NetworkUtils net = new NetworkUtils( );
+        NetworkUtils net = new NetworkUtils(new MockContext());
 
         try
         {
