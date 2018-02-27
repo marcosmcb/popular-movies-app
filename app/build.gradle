@@ -36,6 +36,11 @@ dependencies {
     // Add RecyclerView Dependency
     compile 'com.android.support:recyclerview-v7:26.1.0'
 
+    // Add Retrofit
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
