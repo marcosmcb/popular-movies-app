@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.Target;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 import com.example.marcoscavalcante.popularmovies.utils.Size;
-import com.squareup.picasso.Picasso;
+
 
 import java.util.ArrayList;
 
@@ -18,11 +20,11 @@ import java.util.ArrayList;
  * Created by marcoscavalcante on 30/12/2017.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>
+public final class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>
 {
     private static final String TAG = MovieAdapter.class.getSimpleName();
     private ArrayList<Movie> mMovies;
-    private static int viewHolderCount;
+    private int viewHolderCount;
     private OnEntryClickListener mOnEntryClickListener;
 
 
@@ -31,11 +33,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void onEntryClick(View view, int position);
     }
 
+
     public void setOnEntryClickListener(OnEntryClickListener onEntryClickListener)
     {
         mOnEntryClickListener = onEntryClickListener;
     }
-
 
 
     public MovieAdapter( ArrayList<Movie> movies )
@@ -74,7 +76,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         ImageView imageView = view.findViewById( R.id.ivMoviePoster );
         String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.original );
 
-        Picasso.with( context ).load( posterPath ).into( imageView );
+        GlideApp
+                .with( context )
+                .load( posterPath )
+                .thumbnail(0.1f)
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .placeholder(R.drawable.ic_video_loading)
+                .error(R.drawable.ic_error_loading)
+                .fallback(R.drawable.ic_resource_null)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into( imageView );
+
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener

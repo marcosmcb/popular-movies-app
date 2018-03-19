@@ -11,4 +11,5 @@
     <string name="max_vote_average">10</string>
     <string name="error_message_menu">Couldn\'t find item!</string>
     <string name="sort_favourites">Favourites</string>
+
 </resources>

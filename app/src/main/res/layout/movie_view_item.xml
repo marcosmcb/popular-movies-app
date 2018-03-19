@@ -4,7 +4,7 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-5
+
     <ImageView
         android:id="@+id/ivMoviePoster"
         android:adjustViewBounds="true"

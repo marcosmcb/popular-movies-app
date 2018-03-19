@@ -28,7 +28,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>
 {
     private NetworkUtils mNetworkUtils;
-    private TextView mTestMessage;
     private TextView mErrorMessage;
     private ProgressBar mLoadingIndicator;
 
@@ -41,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int NUM_COLUMNS_PORTRAIT  = 2;
     private static final int NUM_COLUMNS_LANDSCAPE = 4;
     private static final int LOADER_MOVIES = 11;
+    private Menu menu;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setGridLayoutManager();
         setRecyclerView();
 
+
         getSupportLoaderManager().initLoader( LOADER_MOVIES, null, this);
 
         callLoader();
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 String movieJson = mMovies.get(position).getMovieJson().toString();
                 startMovieDetailsActivityIntent.putExtra("movie", movieJson );
-
 
                 startActivity(startMovieDetailsActivityIntent);
             }
@@ -103,17 +104,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         {
             loaderManager.restartLoader( LOADER_MOVIES, null, this );
         }
-
-        /*
-        try
-        {
-            makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        */
     }
 
     private void setGridLayoutManager()
@@ -128,15 +118,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    public void showJsonDataView( )
-    {
-        mErrorMessage.setVisibility(View.INVISIBLE);
-    }
-
-    public void showErrorMessage( )
-    {
-        mErrorMessage.setVisibility(View.VISIBLE);
-    }
 
     private void makeTheMovieDBQuery( String param ) throws IOException
     {
@@ -161,12 +142,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate( R.menu.main, menu );
+        this.menu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        menu.getItem(0).setIcon( getApplicationContext().getDrawable(R.drawable.ic_sort));
+
         int menuItemThatWasSelected = item.getItemId();
 
         switch( menuItemThatWasSelected )
@@ -194,82 +178,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 break;
 
+            case R.id.action_sort_favourites:
+                break;
+
+            /*
             default:
                 Toast.makeText( MainActivity.this,
-                                 getString(R.string.error_message_menu),
+                        getString(R.string.error_message_menu) + " [" + menuItemThatWasSelected + "]",
                                  Toast.LENGTH_LONG ).show();
                 break;
+            */
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-
-    public NetworkUtils getmNetworkUtils() {
-        return mNetworkUtils;
-    }
-
-    public void setmNetworkUtils(NetworkUtils mNetworkUtils) {
-        this.mNetworkUtils = mNetworkUtils;
-    }
-
-    public TextView getmTestMessage() {
-        return mTestMessage;
-    }
-
-    public void setmTestMessage(TextView mTestMessage) {
-        this.mTestMessage = mTestMessage;
-    }
-
-    public TextView getmErrorMessage() {
-        return mErrorMessage;
-    }
-
-    public void setmErrorMessage(TextView mErrorMessage) {
-        this.mErrorMessage = mErrorMessage;
-    }
-
-    public ProgressBar getmLoadingIndicator() {
-        return mLoadingIndicator;
-    }
-
-    public void setmLoadingIndicator(ProgressBar mLoadingIndicator)
-    {
-        this.mLoadingIndicator = mLoadingIndicator;
-    }
-
-    public ArrayList<Movie> getmMovies() {
-        return mMovies;
-    }
-
-    public void setmMovies(ArrayList<Movie> mMovies) {
-        this.mMovies = mMovies;
-    }
-
-    public MovieAdapter getmMovieAdapter() {
-        return mMovieAdapter;
-    }
-
-    public void setmMovieAdapter(MovieAdapter mMovieAdapter) {
-        this.mMovieAdapter = mMovieAdapter;
-    }
-
-    public RecyclerView getmRecyclerView() {
-        return mRecyclerView;
-    }
-
-    public void setmRecyclerView(RecyclerView mRecyclerView) {
-        this.mRecyclerView = mRecyclerView;
-    }
-
-    public GridLayoutManager getmGridLayoutManager() {
-        return mGridLayoutManager;
-    }
-
-    public void setmGridLayoutManager(GridLayoutManager mGridLayoutManager)
-    {
-        this.mGridLayoutManager = mGridLayoutManager;
-    }
 
     @Override
     public Loader<String> onCreateLoader(int id, final Bundle args)
@@ -324,28 +247,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
     }
 
+
+
     @Override
     public void onLoadFinished(Loader<String> loader, String data)
     {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-        if( data == null )
-        {
-            showErrorMessage();
-        }
-        else
-        {
-            //
-            showJsonDataView();
-        }
-
+        if( data == null )  showErrorMessage();
+        else                showJsonDataView();
     }
+
+    public NetworkUtils getmNetworkUtils() { return mNetworkUtils; }
+
+    public ProgressBar getmLoadingIndicator() { return mLoadingIndicator; }
+
+    public ArrayList<Movie> getmMovies() { return mMovies; }
+
+    public MovieAdapter getmMovieAdapter() { return mMovieAdapter; }
+
+    public void showJsonDataView( ) { mErrorMessage.setVisibility(View.INVISIBLE); }
+
+    public void showErrorMessage( ) { mErrorMessage.setVisibility(View.VISIBLE); }
 
     @Override
-    public void onLoaderReset(Loader<String> loader)
-    {
-
-    }
+    public void onLoaderReset(Loader<String> loader) { }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
