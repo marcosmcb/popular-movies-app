@@ -5,8 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +15,6 @@ import com.bumptech.glide.Glide;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 import com.example.marcoscavalcante.popularmovies.utils.Size;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,8 +51,6 @@ public class MovieDetailsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tb_tv_title_details);
-
         mPoster         = findViewById(R.id.iv_poster_details);
         mOverview       = findViewById(R.id.tv_overview_details);
         mReleaseDate    = findViewById(R.id.tv_release_date_details);
@@ -63,7 +58,6 @@ public class MovieDetailsActivity extends AppCompatActivity
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
 
         Intent movieDetails = getIntent();
 
@@ -112,15 +106,24 @@ public class MovieDetailsActivity extends AppCompatActivity
                 return true;
 
             case R.id.share_button:
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_VIEW);
-                shareIntent.setData( Uri.parse("https://www.youtube.com/watch?v=NZRlo1Caz7U") );
-
-                startActivity( shareIntent );
+                shareVideo("youtube");
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void shareVideo( String url )
+    {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_VIEW);
+        shareIntent.setData( Uri.parse( url ) );
+
+        if( shareIntent.resolveActivity(getPackageManager()) != null )
+        {
+            startActivity( shareIntent );
         }
     }
 

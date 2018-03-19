@@ -79,7 +79,6 @@ public final class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieV
         GlideApp
                 .with( context )
                 .load( posterPath )
-                .thumbnail(0.1f)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .placeholder(R.drawable.ic_video_loading)
                 .error(R.drawable.ic_error_loading)

@@ -26,6 +26,11 @@
             >
         </activity>
 
+        <provider
+            android:authorities="com.example.marcoscavalcante.popularmovies"
+            android:name="com.example.marcoscavalcante.popularmovies.data.FavouriteProvider"
+            android:exported="false" />
+
     </application>
 
 </manifest>
