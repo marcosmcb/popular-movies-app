@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -28,6 +29,9 @@ public class Movie
     private String overview;
     private String releaseDate;
     private JSONObject movieJson;
+    private ArrayList<Review> reviews;
+    private ArrayList<Trailer> trailers;
+
 
     public Movie(JSONObject movie) throws JSONException, ParseException
     {
@@ -46,6 +50,45 @@ public class Movie
         this.releaseDate        = movie.getString("release_date");
         this.movieJson          = movie;
     }
+
+    public Movie(JSONObject movie, ArrayList<Trailer> trailers, ArrayList<Review> reviews )
+            throws JSONException, ParseException
+    {
+        this.voteCount          = movie.getInt("vote_count");
+        this.id                 = movie.getInt("id");
+        this.hasVideo           = movie.getBoolean("video");
+        this.voteAverage        = movie.getDouble("vote_average");
+        this.title              = movie.getString("title");
+        this.popularity         = movie.getDouble("popularity");
+        this.posterPath         = movie.getString("poster_path");
+        this.originalLanguage   = movie.getString("original_language");
+        this.originalTitle      = movie.getString("original_title");
+        this.backdropPath       = movie.getString("backdrop_path");
+        this.isAdult            = movie.getBoolean("adult");
+        this.overview           = movie.getString("overview");
+        this.releaseDate        = movie.getString("release_date");
+        this.trailers           = trailers;
+        this.reviews            = reviews;
+
+        this.movieJson          = movie;
+    }
+
+    public ArrayList<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(ArrayList<Review> reviews) {
+        this.reviews = reviews;
+    }
+
+    public ArrayList<Trailer> getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(ArrayList<Trailer> trailers) {
+        this.trailers = trailers;
+    }
+
 
 
     public int getVoteCount() {

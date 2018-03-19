@@ -15,13 +15,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 
@@ -36,11 +40,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridLayoutManager;
+    private Menu mMenu;
 
-    private static final int NUM_COLUMNS_PORTRAIT  = 2;
-    private static final int NUM_COLUMNS_LANDSCAPE = 4;
-    private static final int LOADER_MOVIES = 11;
-    private Menu menu;
+
+    private static final int NUM_COLUMNS_PORTRAIT      = 2;
+    private static final int NUM_COLUMNS_LANDSCAPE     = 4;
+    private static final int MOVIES_LOADER             = 11;
+    private static final String SEARCH_QUERY_URL_EXTRA = "query";
+
 
 
     @Override
@@ -56,14 +63,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mMovieAdapter     = new MovieAdapter( mMovies );
         mRecyclerView     = findViewById( R.id.rv_movies );
 
+        reloadSavedInstance( savedInstanceState );
         setMovieAdapterListener();
         setGridLayoutManager();
         setRecyclerView();
 
+        getSupportLoaderManager().initLoader(MOVIES_LOADER, null, this);
+    }
 
-        getSupportLoaderManager().initLoader( LOADER_MOVIES, null, this);
 
-        callLoader();
+    private void reloadSavedInstance(Bundle savedInstanceState)
+    {
+        if(savedInstanceState != null)
+        {
+            String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
+        }
     }
 
     private void setMovieAdapterListener( )
@@ -91,18 +105,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.setAdapter( mMovieAdapter );
     }
 
-    private void callLoader( )
+    private void callLoader( URL movieQuery )
     {
+        Bundle queryBundle = new Bundle();
+        queryBundle.putString( SEARCH_QUERY_URL_EXTRA, movieQuery.toString() );
+
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> movieLoader = loaderManager.getLoader(LOADER_MOVIES);
+        Loader<String> movieLoader = loaderManager.getLoader(MOVIES_LOADER);
 
         if( movieLoader == null )
         {
-            loaderManager.initLoader( LOADER_MOVIES, null, this );
+            loaderManager.initLoader(MOVIES_LOADER, queryBundle, this );
         }
         else
         {
-            loaderManager.restartLoader( LOADER_MOVIES, null, this );
+            loaderManager.restartLoader(MOVIES_LOADER, queryBundle, this );
         }
     }
 
@@ -134,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             movieDbQueryUrl = mNetworkUtils.getUrlTopRated();
         }
 
-        new TheMovieDBTask( this ).execute( movieDbQueryUrl );
+        callLoader( movieDbQueryUrl );
     }
 
 
@@ -142,14 +159,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate( R.menu.main, menu );
-        this.menu = menu;
+        this.mMenu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        menu.getItem(0).setIcon( getApplicationContext().getDrawable(R.drawable.ic_sort));
+        mMenu.getItem(0).setIcon( getApplicationContext().getDrawable(R.drawable.ic_sort));
 
         int menuItemThatWasSelected = item.getItemId();
 
@@ -199,42 +216,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     {
         return new AsyncTaskLoader<String>(this)
         {
+            // It will store the raw json, so we don't need to query again
             String mMovieJson;
 
             @Override
             protected void onStartLoading()
             {
-                if(args == null)
-                {
-                    return;
-                }
+                if(args == null)    return;
 
                 mLoadingIndicator.setVisibility(View.VISIBLE);
 
-                if(mMovieJson != null)
-                {
-                    deliverResult(mMovieJson);
-                }
-                else
-                {
-                    forceLoad();
-                }
+                if(mMovieJson != null)  deliverResult(mMovieJson);
+                else                    forceLoad();
             }
 
             @Override
             public String loadInBackground()
             {
-                String searchQueryUrlString = args.getString( "" );
+                String searchStr = args.getString( SEARCH_QUERY_URL_EXTRA );
 
-                if( searchQueryUrlString == null || searchQueryUrlString.isEmpty() )
-                {
-                    return null;
-                }
+                if( searchStr == null || searchStr.isEmpty() )  return null;
 
                 try
                 {
-                    URL movieUrl = new URL( searchQueryUrlString );
-                    String movieSearchResults = NetworkUtils.getPosterUrl(null,null);
+                    URL movieUrl = new URL( searchStr );
+                    String movieSearchResults = mNetworkUtils.getResponseFromHttpUrl( movieUrl );
                     return movieSearchResults;
                 }
                 catch(IOException e)
@@ -254,8 +260,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-        if( data == null )  showErrorMessage();
-        else                showJsonDataView();
+        if( data != null && !data.isEmpty() )
+        {
+            showJsonDataView();
+            try
+            {
+                JSONObject jsonObject = new JSONObject(data);
+                JSONArray jsonArray  = jsonObject.getJSONArray("results");
+
+                for( int i=0; i < jsonArray.length(); i++ )
+                {
+                    JSONObject movieJson = jsonArray.getJSONObject(i);
+                    getmMovies().add( new Movie( movieJson ) );
+                }
+
+                getmMovieAdapter().notifyDataSetChanged();
+            }
+            catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+            catch (ParseException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            showErrorMessage();
+        }
     }
 
     public NetworkUtils getmNetworkUtils() { return mNetworkUtils; }
@@ -274,7 +307,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<String> loader) { }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
+
+
     }
 }
