@@ -3,15 +3,16 @@ package com.example.marcoscavalcante.popularmovies;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View.OnClickListener;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 import com.example.marcoscavalcante.popularmovies.utils.Size;
@@ -34,7 +35,9 @@ public class MovieDetailsActivity extends AppCompatActivity
     private TextView  mOverview;
     private TextView  mReleaseDate;
     private TextView  mVoteAverage;
+    private FloatingActionButton mFavouriteButton;
     private Movie     mMovie;
+
 
 
     @Override
@@ -51,10 +54,11 @@ public class MovieDetailsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details);
 
-        mPoster         = findViewById(R.id.iv_poster_details);
-        mOverview       = findViewById(R.id.tv_overview_details);
-        mReleaseDate    = findViewById(R.id.tv_release_date_details);
-        mVoteAverage    = findViewById(R.id.tv_vote_average_details);
+        mPoster          = findViewById(R.id.iv_poster_details);
+        mOverview        = findViewById(R.id.tv_overview_details);
+        mReleaseDate     = findViewById(R.id.tv_release_date_details);
+        mVoteAverage     = findViewById(R.id.tv_vote_average_details);
+        mFavouriteButton = findViewById(R.id.fav_button_movie);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -76,6 +80,7 @@ public class MovieDetailsActivity extends AppCompatActivity
                 mOverview.setText( mMovie.getOverview() );
                 mVoteAverage.setText( mMovie.getVoteAverage().toString() + '/' + getString(R.string.max_vote_average) );
                 mReleaseDate.setText( releaseDate );
+                mFavouriteButton.setOnClickListener( onClickListener );
 
                 GlideApp
                         .with( this )
@@ -113,6 +118,21 @@ public class MovieDetailsActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private OnClickListener onClickListener = new OnClickListener() {
+        @Override
+        public void onClick(final View v)
+        {
+            switch(v.getId())
+            {
+                case R.id.fav_button_movie:
+
+                    mFavouriteButton.setImageResource( R.drawable.ic_fav_selected );
+
+                    break;
+            }
+        }
+    };
 
 
     private void shareVideo( String url )

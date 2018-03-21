@@ -122,11 +122,13 @@
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:src="@drawable/ic_fav"
+        android:id="@+id/fav_button_movie"
+        android:src="@drawable/ic_fav_not_selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
+        android:backgroundTint="@color/colorBackgroundFloating"
         app:layout_anchor="@id/abl_movie_details"
         app:layout_anchorGravity="bottom|right|end"
         />
