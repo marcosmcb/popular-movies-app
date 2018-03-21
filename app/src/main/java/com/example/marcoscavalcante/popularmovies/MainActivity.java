@@ -311,6 +311,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     {
         super.onSaveInstanceState(outState);
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //getSupportLoaderManager().restartLoader()
     }
 }
