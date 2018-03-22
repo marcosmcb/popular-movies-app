@@ -182,7 +182,7 @@ public class FavouriteProvider extends ContentProvider
         {
             case MOVIES_WITH_ID:
                 String id = uri.getPathSegments().get(1);
-                String mWhereClause = "_id=?";
+                String mWhereClause = FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID + "=?";
                 String[] mWhereArgs = new String[]{id};
 
                 numberOfDeletedItems = db.delete(FavouriteContract.FavouriteMovieEntry.TABLE_NAME,
