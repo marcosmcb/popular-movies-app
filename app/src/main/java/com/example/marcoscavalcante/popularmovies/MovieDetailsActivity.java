@@ -1,18 +1,25 @@
 package com.example.marcoscavalcante.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.marcoscavalcante.popularmovies.data.FavouriteContract;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 import com.example.marcoscavalcante.popularmovies.utils.Size;
@@ -26,9 +33,11 @@ import java.text.ParseException;
  * Created by marcoscavalcante on 30/12/2017.
  */
 
-public class MovieDetailsActivity extends AppCompatActivity
+public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final String TAG = MovieDetailsActivity.class.getSimpleName();
+    private static final int MOVIE_LOADER_ID = 10;
+
 
     /* Field to store our TextView */
     private ImageView mPoster;
@@ -37,6 +46,7 @@ public class MovieDetailsActivity extends AppCompatActivity
     private TextView  mVoteAverage;
     private FloatingActionButton mFavouriteButton;
     private Movie     mMovie;
+    private boolean mIsFavourite;
 
 
 
@@ -82,6 +92,8 @@ public class MovieDetailsActivity extends AppCompatActivity
                 mReleaseDate.setText( releaseDate );
                 mFavouriteButton.setOnClickListener( onClickListener );
 
+                getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+
                 GlideApp
                         .with( this )
                         .load( posterPath )
@@ -119,20 +131,53 @@ public class MovieDetailsActivity extends AppCompatActivity
         }
     }
 
-    private OnClickListener onClickListener = new OnClickListener() {
+
+    private OnClickListener onClickListener = new OnClickListener()
+    {
         @Override
         public void onClick(final View v)
         {
+            Uri uri;
+
             switch(v.getId())
             {
                 case R.id.fav_button_movie:
 
-                    mFavouriteButton.setImageResource( R.drawable.ic_fav_selected );
+                    if( mIsFavourite )
+                    {
+                        uri = FavouriteContract.FavouriteMovieEntry.CONTENT_URI.buildUpon()
+                                .appendPath(mMovie.getId()+"").build();
 
+                        int movieDeleted = getContentResolver().delete(uri,null,null);
+
+                        if(movieDeleted != -1)
+                        {
+                            Toast.makeText(getBaseContext(), "Movie removed from favourites", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                    {
+                        uri = getContentResolver().insert(FavouriteContract.FavouriteMovieEntry.CONTENT_URI,
+                                mMovie.getContentValues());
+
+                        if (uri != null)
+                        {
+                            Toast.makeText(getBaseContext(), "Movie added to favourites", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    switchIcon();
+                    getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, MovieDetailsActivity.this);
                     break;
             }
         }
     };
+
+    private void switchIcon()
+    {
+        if( mIsFavourite )  mFavouriteButton.setImageResource( R.drawable.ic_fav_selected );
+        else                mFavouriteButton.setImageResource( R.drawable.ic_fav_not_selected );
+    }
 
 
     private void shareVideo( String url )
@@ -147,4 +192,70 @@ public class MovieDetailsActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, final Bundle args)
+    {
+        return new AsyncTaskLoader<Cursor>(this)
+        {
+            Cursor mMovieData = null;
+
+            @Override
+            protected void onStartLoading()
+            {
+                if(mMovieData != null)  deliverResult(mMovieData);
+
+                else                    forceLoad();
+            }
+
+            @Override
+            public Cursor loadInBackground()
+            {
+                String[] columns  = new String[]{ FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID };
+                String mSelection = FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID + " = " + mMovie.getId();
+                try
+                {
+                    Log.d(TAG, "Performing QUERY to get movie by movie ID");
+                    return getContentResolver().query(FavouriteContract.FavouriteMovieEntry.CONTENT_URI,
+                            columns,
+                            mSelection,
+                            null,
+                            FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID);
+
+                }
+                catch(Exception e)
+                {
+                    Log.e(TAG, "Failed to asynchronously load data");
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public void deliverResult(Cursor data)
+            {
+                mMovieData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+    {
+        mIsFavourite = (data.getCount() == 1) ? true : false;
+        switchIcon();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
+        //
+    }
 }

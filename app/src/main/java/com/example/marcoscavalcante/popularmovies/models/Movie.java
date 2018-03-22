@@ -1,13 +1,14 @@
 package com.example.marcoscavalcante.popularmovies.models;
 
+import android.content.ContentValues;
+
+import com.example.marcoscavalcante.popularmovies.data.FavouriteContract.FavouriteMovieEntry;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by marcoscavalcante on 30/12/2017.
@@ -73,6 +74,36 @@ public class Movie
         this.movieJson          = movie;
     }
 
+    /*
+    *       FavouriteMovieEntry.COLUMN_TITLE + " TEXT," +
+            FavouriteMovieEntry.COLUMN_OVERVIEW + " TEXT," +
+            FavouriteMovieEntry.COLUMN_HAS_VIDEO + " INTEGER," +
+            FavouriteMovieEntry.COLUMN_MOVIE_ID + " TEXT," +
+            FavouriteMovieEntry.COLUMN_VOTE_AVERAGE + " REAL," +
+            FavouriteMovieEntry.COLUMN_VOTE_COUNT + " REAL," +
+            FavouriteMovieEntry.COLUMN_BACKDROP_PATH + " BLOB," +
+            FavouriteMovieEntry.COLUMN_POPULARITY + " REAL," +
+            FavouriteMovieEntry.COLUMN_RELEASE_DATE + " DATE," +
+            FavouriteMovieEntry.COLUMN_POSTER_PATH + " BLOB)";
+    * */
+
+    public ContentValues getContentValues( )
+    {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(FavouriteMovieEntry.COLUMN_TITLE, this.getTitle());
+        contentValues.put(FavouriteMovieEntry.COLUMN_OVERVIEW, this.getOverview());
+        contentValues.put(FavouriteMovieEntry.COLUMN_HAS_VIDEO, this.hasVideo());
+
+        contentValues.put(FavouriteMovieEntry.COLUMN_MOVIE_ID, this.getId());
+
+        contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_AVERAGE, this.getVoteAverage());
+        contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_COUNT, this.getVoteCount());
+        contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_COUNT, this.getVoteCount());
+
+        return contentValues;
+    }
+
     public ArrayList<Review> getReviews() {
         return reviews;
     }
@@ -107,7 +138,7 @@ public class Movie
         this.id = id;
     }
 
-    public boolean isHasVideo() {
+    public boolean hasVideo() {
         return hasVideo;
     }
 
