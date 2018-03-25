@@ -1,12 +1,17 @@
 package com.example.marcoscavalcante.popularmovies.models;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.util.Base64;
+import android.util.Base64InputStream;
 
 import com.example.marcoscavalcante.popularmovies.data.FavouriteContract.FavouriteMovieEntry;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -17,6 +22,7 @@ import java.util.ArrayList;
 public class Movie
 {
     private int voteCount;
+    private int movieIdDb;
     private int id;
     private boolean hasVideo;
     private Double voteAverage;
@@ -30,8 +36,23 @@ public class Movie
     private String overview;
     private String releaseDate;
     private JSONObject movieJson;
-    private ArrayList<Review> reviews;
-    private ArrayList<Trailer> trailers;
+    private byte[] posterImage;
+
+
+    public Movie(Cursor movie)
+    {
+        this.movieIdDb          = movie.getInt( movie.getColumnIndex(FavouriteMovieEntry._ID) );
+        this.voteCount          = movie.getInt( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_VOTE_COUNT) );
+        this.id                 = movie.getInt( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_MOVIE_ID) );
+        this.hasVideo           = movie.getInt( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_HAS_VIDEO) ) > 0 ? true : false;
+        this.voteAverage        = movie.getDouble( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_VOTE_AVERAGE) );
+        this.title              = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_TITLE) );
+        this.popularity         = movie.getDouble( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_POPULARITY) );
+        this.posterImage        = movie.getBlob( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_POSTER_PATH) );
+        this.backdropPath       = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_BACKDROP_PATH) );
+        this.overview           = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_OVERVIEW) );
+        this.releaseDate        = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_RELEASE_DATE) );
+    }
 
 
     public Movie(JSONObject movie) throws JSONException, ParseException
@@ -42,52 +63,19 @@ public class Movie
         this.voteAverage        = movie.getDouble("vote_average");
         this.title              = movie.getString("title");
         this.popularity         = movie.getDouble("popularity");
-        this.posterPath         = movie.getString("poster_path");
-        this.originalLanguage   = movie.getString("original_language");
-        this.originalTitle      = movie.getString("original_title");
-        this.backdropPath       = movie.getString("backdrop_path");
-        this.isAdult            = movie.getBoolean("adult");
+
+        this.posterPath         = movie.has("poster_path") ? movie.getString("poster_path") : null;
+        this.originalLanguage   = movie.has("original_language") ? movie.getString("original_language") : null;
+        this.originalTitle      = movie.has("original_title") ? movie.getString("original_title") : null;
+        this.backdropPath       = movie.has("backdrop_path") ? movie.getString("backdrop_path") : null;
+        this.isAdult            = movie.has("adult") ? movie.getBoolean("adult") : false;
         this.overview           = movie.getString("overview");
         this.releaseDate        = movie.getString("release_date");
         this.movieJson          = movie;
     }
 
-    public Movie(JSONObject movie, ArrayList<Trailer> trailers, ArrayList<Review> reviews )
-            throws JSONException, ParseException
-    {
-        this.voteCount          = movie.getInt("vote_count");
-        this.id                 = movie.getInt("id");
-        this.hasVideo           = movie.getBoolean("video");
-        this.voteAverage        = movie.getDouble("vote_average");
-        this.title              = movie.getString("title");
-        this.popularity         = movie.getDouble("popularity");
-        this.posterPath         = movie.getString("poster_path");
-        this.originalLanguage   = movie.getString("original_language");
-        this.originalTitle      = movie.getString("original_title");
-        this.backdropPath       = movie.getString("backdrop_path");
-        this.isAdult            = movie.getBoolean("adult");
-        this.overview           = movie.getString("overview");
-        this.releaseDate        = movie.getString("release_date");
-        this.trailers           = trailers;
-        this.reviews            = reviews;
 
-        this.movieJson          = movie;
-    }
-
-    /*
-    *       FavouriteMovieEntry.COLUMN_TITLE + " TEXT," +
-            FavouriteMovieEntry.COLUMN_OVERVIEW + " TEXT," +
-            FavouriteMovieEntry.COLUMN_HAS_VIDEO + " INTEGER," +
-            FavouriteMovieEntry.COLUMN_MOVIE_ID + " TEXT," +
-            FavouriteMovieEntry.COLUMN_VOTE_AVERAGE + " REAL," +
-            FavouriteMovieEntry.COLUMN_VOTE_COUNT + " REAL," +
-            FavouriteMovieEntry.COLUMN_BACKDROP_PATH + " BLOB," +
-            FavouriteMovieEntry.COLUMN_POPULARITY + " REAL," +
-            FavouriteMovieEntry.COLUMN_RELEASE_DATE + " DATE," +
-            FavouriteMovieEntry.COLUMN_POSTER_PATH + " BLOB)";
-    * */
-
-    public ContentValues getContentValues( )
+    public ContentValues getContentValues(byte[] image)
     {
         ContentValues contentValues = new ContentValues();
 
@@ -99,27 +87,13 @@ public class Movie
 
         contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_AVERAGE, this.getVoteAverage());
         contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_COUNT, this.getVoteCount());
-        contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_COUNT, this.getVoteCount());
+        contentValues.put(FavouriteMovieEntry.COLUMN_RELEASE_DATE, this.getReleaseDate());
+
+
+        contentValues.put(FavouriteMovieEntry.COLUMN_POSTER_PATH, image);
 
         return contentValues;
     }
-
-    public ArrayList<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(ArrayList<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    public ArrayList<Trailer> getTrailers() {
-        return trailers;
-    }
-
-    public void setTrailers(ArrayList<Trailer> trailers) {
-        this.trailers = trailers;
-    }
-
 
 
     public int getVoteCount() {
@@ -227,12 +201,38 @@ public class Movie
     }
 
 
-    public JSONObject getMovieJson() {
+    public JSONObject getMovieJson() throws JSONException
+    {
+        if( this.movieJson == null )
+        {
+            this.movieJson = new JSONObject();
+            this.movieJson.put( "vote_count", this.getVoteCount() );
+            this.movieJson.put( "id", this.getId() );
+            this.movieJson.put( "video", this.hasVideo() );
+            this.movieJson.put( "vote_average", this.getVoteAverage() );
+            this.movieJson.put( "title", this.getTitle() );
+            this.movieJson.put( "popularity", this.getPopularity() );
+            this.movieJson.put("overview", this.getOverview());
+            this.movieJson.put("release_date", this.getReleaseDate());
+        }
+
         return movieJson;
     }
 
     public void setMovieJson(JSONObject movieJson) {
         this.movieJson = movieJson;
+    }
+
+    public boolean isHasVideo() {
+        return hasVideo;
+    }
+
+    public byte[] getPosterImage() {
+        return posterImage;
+    }
+
+    public void setPosterImage(byte[] posterImage) {
+        this.posterImage = posterImage;
     }
 
 }

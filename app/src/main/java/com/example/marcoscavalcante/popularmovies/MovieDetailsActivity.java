@@ -1,7 +1,11 @@
 package com.example.marcoscavalcante.popularmovies;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -19,15 +23,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.request.target.Target;
 import com.example.marcoscavalcante.popularmovies.data.FavouriteContract;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
+import com.example.marcoscavalcante.popularmovies.models.Review;
+import com.example.marcoscavalcante.popularmovies.models.Trailer;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 import com.example.marcoscavalcante.popularmovies.utils.Size;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 /**
  * Created by marcoscavalcante on 30/12/2017.
@@ -37,6 +50,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 {
     private static final String TAG = MovieDetailsActivity.class.getSimpleName();
     private static final int MOVIE_LOADER_ID = 10;
+    private static final int MOVIE_REVIEWS_VIDEOS_LOADER = 11;
+
 
 
     /* Field to store our TextView */
@@ -47,6 +62,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private FloatingActionButton mFavouriteButton;
     private Movie     mMovie;
     private boolean mIsFavourite;
+    private NetworkUtils mNetworkUtils;
+    private ArrayList<Review> reviews;
+    private ArrayList<Trailer> trailers;
 
 
 
@@ -69,6 +87,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         mReleaseDate     = findViewById(R.id.tv_release_date_details);
         mVoteAverage     = findViewById(R.id.tv_vote_average_details);
         mFavouriteButton = findViewById(R.id.fav_button_movie);
+        mNetworkUtils    = new NetworkUtils( this );
+        reviews          = new ArrayList<Review>();
+        trailers         = new ArrayList<Trailer>();
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -82,10 +103,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 JSONObject movieJsonObject = new JSONObject( movieDetails.getStringExtra("movie"));
                 mMovie = new Movie( movieJsonObject );
 
-
+                String posterPath;
                 String releaseDate = mMovie.getReleaseDate().substring(0,4);
-                String posterPath   =  NetworkUtils.getPosterUrl( mMovie.getPosterPath(), Size.w185 );
-
                 setTitle(mMovie.getTitle());
                 mOverview.setText( mMovie.getOverview() );
                 mVoteAverage.setText( mMovie.getVoteAverage().toString() + '/' + getString(R.string.max_vote_average) );
@@ -93,12 +112,20 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 mFavouriteButton.setOnClickListener( onClickListener );
 
                 getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+                getSupportLoaderManager().initLoader( MOVIE_REVIEWS_VIDEOS_LOADER, null, reviewsLoader);
 
-                GlideApp
-                        .with( this )
-                        .load( posterPath )
-                        .centerCrop()
-                        .into( mPoster );
+
+                Log.i( MovieDetailsActivity.class.getName(), "MOVIE TITLE - " + mMovie.getTitle() );
+
+                if (mMovie.getPosterPath() != null)
+                {
+                    posterPath = NetworkUtils.getPosterUrl(mMovie.getPosterPath(), Size.original);
+
+                    GlideApp
+                            .with( this )
+                            .load( posterPath )
+                            .into( mPoster );
+                }
 
             }
             catch (JSONException e)
@@ -158,7 +185,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     else
                     {
                         uri = getContentResolver().insert(FavouriteContract.FavouriteMovieEntry.CONTENT_URI,
-                                mMovie.getContentValues());
+                                mMovie.getContentValues( getByteArray() ));
 
                         if (uri != null)
                         {
@@ -217,13 +244,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             @Override
             public Cursor loadInBackground()
             {
-                String[] columns  = new String[]{ FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID };
                 String mSelection = FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID + " = " + mMovie.getId();
                 try
                 {
                     Log.d(TAG, "Performing QUERY to get movie by movie ID");
                     return getContentResolver().query(FavouriteContract.FavouriteMovieEntry.CONTENT_URI,
-                            columns,
+                            null,
                             mSelection,
                             null,
                             FavouriteContract.FavouriteMovieEntry.COLUMN_MOVIE_ID);
@@ -246,10 +272,35 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         };
     }
 
+    private byte[] getByteArray()
+    {
+        mPoster.buildDrawingCache();
+        Bitmap bitmap =  mPoster.getDrawingCache( );
+        bitmap = Bitmap.createScaledBitmap( bitmap, bitmap.getWidth(), bitmap.getHeight()+300, false );
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data)
     {
-        mIsFavourite = (data.getCount() == 1) ? true : false;
+        mIsFavourite = false;
+
+        if( data != null && data.moveToFirst() )
+        {
+            mIsFavourite = true;
+            if( mMovie.getPosterPath() == null )
+            {
+                byte[] image =  new Movie(data).getPosterImage();
+                GlideApp
+                        .with( this )
+                        .load( image )
+                        .into( mPoster );
+
+            }
+        }
+
         switchIcon();
     }
 
@@ -258,4 +309,82 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     {
         //
     }
+
+
+    private LoaderManager.LoaderCallbacks<ArrayList<String>> reviewsLoader = new LoaderManager.LoaderCallbacks<ArrayList<String>>()
+    {
+        @Override
+        public Loader<ArrayList<String>> onCreateLoader(int id, final Bundle args)
+        {
+            return new AsyncTaskLoader<ArrayList<String>>( MovieDetailsActivity.this )
+            {
+                ArrayList<String> mMovieData = null;
+
+                @Override
+                protected void onStartLoading()
+                {
+                    if(mMovieData != null) deliverResult(mMovieData);
+                    else                   forceLoad();
+                }
+
+                @Override
+                public ArrayList<String> loadInBackground()
+                {
+                    try
+                    {
+                        String movieReviews = mNetworkUtils.getResponseFromHttpUrl( mNetworkUtils.getMovieReviews( mMovie.getId() ) );
+                        String movieVideos  = mNetworkUtils.getResponseFromHttpUrl( mNetworkUtils.getMovieTraillers( mMovie.getId() ) );
+
+                        mMovieData.add( movieReviews );
+                        mMovieData.add( movieVideos );
+
+                        return mMovieData;
+                    }
+                    catch(IOException e)
+                    {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                public void deliverResult(ArrayList<String> data)
+                {
+                    mMovieData = data;
+                    super.deliverResult(data);
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ArrayList<String>> loader, ArrayList<String> data)
+        {
+
+            String reviews = data.get(0);
+            String videos  = data.get(1);
+
+            try
+            {
+                JSONObject reviewsJson = new JSONObject(reviews);
+                JSONArray reviewArray  = reviewsJson.getJSONArray("results");
+
+                for (int i = 0; i < reviewArray.length(); i++) {
+                    JSONObject review = reviewArray.getJSONObject(i);
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        @Override
+        public void onLoaderReset(Loader<ArrayList<String>> loader)
+        {
+
+        }
+    };
+
 }
