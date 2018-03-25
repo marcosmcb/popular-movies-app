@@ -1,7 +1,10 @@
 package com.example.marcoscavalcante.popularmovies;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +19,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.marcoscavalcante.popularmovies.data.FavouriteContract;
+import com.example.marcoscavalcante.popularmovies.data.FavouriteDbHelper;
 import com.example.marcoscavalcante.popularmovies.models.Movie;
 import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 
@@ -24,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -45,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int NUM_COLUMNS_PORTRAIT      = 2;
     private static final int NUM_COLUMNS_LANDSCAPE     = 4;
-    private static final int MOVIES_LOADER             = 11;
+    private static final int MOVIES_LOADER             = 1;
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
 
 
@@ -67,6 +73,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setMovieAdapterListener();
         setGridLayoutManager();
         setRecyclerView();
+
+        Class mDbHelperClass = FavouriteDbHelper.class;
+
+
+        Field f = null;
+        try {
+            f = mDbHelperClass.getDeclaredField("DATABASE_NAME");
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        f.setAccessible(true);
+        try {
+            this.deleteDatabase((String)f.get(null));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
         getSupportLoaderManager().initLoader(MOVIES_LOADER, null, this);
     }
@@ -90,7 +112,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Class movieDetails = MovieDetailsActivity.class;
                 Intent startMovieDetailsActivityIntent = new Intent(MainActivity.this, movieDetails);
 
-                String movieJson = mMovies.get(position).getMovieJson().toString();
+                String movieJson = null;
+                try
+                {
+                    movieJson = mMovies.get(position).getMovieJson().toString();
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+
                 startMovieDetailsActivityIntent.putExtra("movie", movieJson );
 
                 startActivity(startMovieDetailsActivityIntent);
@@ -183,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 break;
 
-
             case R.id.action_sort_top_rated:
                 try
                 {
@@ -196,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
 
             case R.id.action_sort_favourites:
+                getSupportLoaderManager().restartLoader(12, null, favouriteLoader);
+
                 break;
 
             /*
@@ -252,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         };
     }
-
 
 
     @Override
@@ -318,4 +349,74 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onResume();
         //getSupportLoaderManager().restartLoader()
     }
+
+
+    private LoaderManager.LoaderCallbacks<Cursor> favouriteLoader = new LoaderManager.LoaderCallbacks<Cursor>()
+    {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, final Bundle args)
+        {
+            return new AsyncTaskLoader<Cursor>(MainActivity.this)
+            {
+                Cursor mMovieData = null;
+
+                @Override
+                protected void onStartLoading()
+                {
+                    MainActivity.this.mLoadingIndicator.setVisibility(View.VISIBLE);
+                    getmMovies().clear();
+
+                    if(mMovieData != null)
+                        deliverResult(mMovieData);
+                    else
+                        forceLoad();
+                }
+
+                @Override
+                public Cursor loadInBackground()
+                {
+                    try
+                    {
+                        return getContentResolver().query(FavouriteContract.FavouriteMovieEntry.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                null);
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                public void deliverResult(Cursor data)
+                {
+                    mMovieData = data;
+                    super.deliverResult(data);
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data)
+        {
+            MainActivity.this.mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+            while(data.moveToNext())
+            {
+                Movie mMovie = new Movie(data);
+                getmMovies().add(mMovie);
+            }
+
+            getmMovieAdapter().notifyDataSetChanged();
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+    };
+
 }

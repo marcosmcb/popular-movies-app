@@ -28,7 +28,8 @@ public class Review
         this.reviewJson = reviewJson;
     }
 
-    public Review(String author, String content, String id, String url, JSONObject reviewJson) {
+    public Review(String author, String content, String id, String url, JSONObject reviewJson)
+    {
         this.author = author;
         this.content = content;
         this.id = id;
