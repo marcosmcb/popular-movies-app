@@ -2,18 +2,11 @@ package com.example.marcoscavalcante.popularmovies.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.util.Base64;
-import android.util.Base64InputStream;
-
 import com.example.marcoscavalcante.popularmovies.data.FavouriteContract.FavouriteMovieEntry;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
-import java.util.ArrayList;
 
 /**
  * Created by marcoscavalcante on 30/12/2017.
@@ -36,7 +29,6 @@ public class Movie
     private String overview;
     private String releaseDate;
     private JSONObject movieJson;
-    private byte[] posterImage;
 
 
     public Movie(Cursor movie)
@@ -48,7 +40,7 @@ public class Movie
         this.voteAverage        = movie.getDouble( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_VOTE_AVERAGE) );
         this.title              = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_TITLE) );
         this.popularity         = movie.getDouble( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_POPULARITY) );
-        this.posterImage        = movie.getBlob( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_POSTER_PATH) );
+        this.posterPath         = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_POSTER_PATH) );
         this.backdropPath       = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_BACKDROP_PATH) );
         this.overview           = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_OVERVIEW) );
         this.releaseDate        = movie.getString( movie.getColumnIndex(FavouriteMovieEntry.COLUMN_RELEASE_DATE) );
@@ -75,7 +67,7 @@ public class Movie
     }
 
 
-    public ContentValues getContentValues(byte[] image)
+    public ContentValues getContentValues( )
     {
         ContentValues contentValues = new ContentValues();
 
@@ -89,8 +81,8 @@ public class Movie
         contentValues.put(FavouriteMovieEntry.COLUMN_VOTE_COUNT, this.getVoteCount());
         contentValues.put(FavouriteMovieEntry.COLUMN_RELEASE_DATE, this.getReleaseDate());
 
-
-        contentValues.put(FavouriteMovieEntry.COLUMN_POSTER_PATH, image);
+        contentValues.put(FavouriteMovieEntry.COLUMN_POSTER_PATH, this.getPosterPath());
+        contentValues.put(FavouriteMovieEntry.COLUMN_BACKDROP_PATH, this.getBackdropPath());
 
         return contentValues;
     }
@@ -214,6 +206,7 @@ public class Movie
             this.movieJson.put( "popularity", this.getPopularity() );
             this.movieJson.put("overview", this.getOverview());
             this.movieJson.put("release_date", this.getReleaseDate());
+            this.movieJson.put("poster_path", this.getPosterPath());
         }
 
         return movieJson;
@@ -225,14 +218,6 @@ public class Movie
 
     public boolean isHasVideo() {
         return hasVideo;
-    }
-
-    public byte[] getPosterImage() {
-        return posterImage;
-    }
-
-    public void setPosterImage(byte[] posterImage) {
-        this.posterImage = posterImage;
     }
 
 }
