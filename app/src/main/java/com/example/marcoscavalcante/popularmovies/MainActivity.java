@@ -136,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.setAdapter( mMovieAdapter );
     }
 
+
+
     private void callLoader( URL movieQuery )
     {
         Bundle queryBundle = new Bundle();
@@ -226,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
 
             case R.id.action_sort_favourites:
+
                 getSupportLoaderManager().restartLoader(12, null, favouriteLoader);
 
                 break;
@@ -338,11 +341,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<String> loader) { }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-    }
+    public void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState); }
 
     @Override
     protected void onResume() {

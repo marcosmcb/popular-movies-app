@@ -74,34 +74,17 @@ public final class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieV
         View view           = holder.itemView;
 
         ImageView imageView = view.findViewById( R.id.ivMoviePoster );
+        String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.original );
 
-        if(movie.getPosterImage() != null)
-        {
-            GlideApp
-                    .with( context )
-                    .asDrawable()
-                    .load( movie.getPosterImage() )
-                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .placeholder(R.drawable.ic_video_loading)
-                    .error(R.drawable.ic_error_loading)
-                    .fallback(R.drawable.ic_resource_null)
-                    .into( imageView );
-        }
-        else
-        {
-            String posterPath   =  NetworkUtils.getPosterUrl( movie.getPosterPath(), Size.original );
-
-            GlideApp
-                    .with( context )
-                    .load( posterPath )
-                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .placeholder(R.drawable.ic_video_loading)
-                    .error(R.drawable.ic_error_loading)
-                    .fallback(R.drawable.ic_resource_null)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .into( imageView );
-        }
-
+        GlideApp
+                .with( context )
+                .load( posterPath )
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .placeholder(R.drawable.ic_video_loading)
+                .error(R.drawable.ic_error_loading)
+                .fallback(R.drawable.ic_resource_null)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into( imageView );
     }
 
     public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
