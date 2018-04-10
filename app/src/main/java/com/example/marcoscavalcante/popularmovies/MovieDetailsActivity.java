@@ -1,5 +1,6 @@
 package com.example.marcoscavalcante.popularmovies;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -118,7 +119,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 String releaseDate = mMovie.getReleaseDate().substring(0,4);
                 setTitle(mMovie.getTitle());
                 mOverview.setText( mMovie.getOverview() );
-                mVoteAverage.setText( mMovie.getVoteAverage().toString() + '/' + getString(R.string.max_vote_average) );
+                mVoteAverage.setText( mMovie.getVoteAverage().toString() + " / " + getString(R.string.max_vote_average) );
                 mReleaseDate.setText( releaseDate );
                 mFavouriteButton.setOnClickListener( onClickListener );
 
