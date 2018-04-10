@@ -72,7 +72,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:weightSum="1"
+                    android:padding="10dp"
                     >
 
                     <LinearLayout
@@ -81,6 +81,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
+
                         <ImageView
                             android:src="@drawable/ic_star"
                             android:paddingTop="10dp"
@@ -88,7 +89,7 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:id="@+id/tv_release_date_details"
+                            android:id="@+id/tv_vote_average_details"
                             android:padding="12dp"
                             android:textSize="20sp"
                             android:textStyle="bold"
@@ -97,6 +98,7 @@
                             android:layout_height="wrap_content" />
 
                     </LinearLayout>
+
 
 
                     <LinearLayout
@@ -112,11 +114,11 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:id="@+id/tv_vote_average_details"
+                            android:id="@+id/tv_release_date_details"
                             android:layout_gravity="center_vertical"
                             android:padding="10dp"
-                            android:layout_marginBottom="15dp"
-                            android:textSize="18sp"
+                            android:layout_marginBottom="10dp"
+                            android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="@color/colorPrimaryText"
                             android:layout_width="wrap_content"
@@ -124,23 +126,62 @@
 
                     </LinearLayout>
 
+
                     <TextView
                         android:id="@+id/tv_overview_details"
-                        android:padding="12dp"
+                        android:padding="5dp"
                         android:textSize="16sp"
                         android:lineSpacingMultiplier="1.5"
-                        android:layout_marginTop="12dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         />
 
                 </LinearLayout>
 
+            </android.support.v7.widget.CardView>
 
-                <android.support.v7.widget.RecyclerView
-                    android:layout_height="match_parent"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <TextView
                     android:layout_width="match_parent"
-                    android:id="@+id/rv_reviews" />
+                    android:layout_height="wrap_content"
+                    android:text="Reviews"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimaryText"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                app:cardElevation="5dp"
+                app:cardUseCompatPadding="true"
+                >
+
+                <LinearLayout
+                    android:id="@+id/fhsffsd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:id="@+id/rv_reviews" />
+                </LinearLayout>
 
             </android.support.v7.widget.CardView>
 
