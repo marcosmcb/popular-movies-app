@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_header_size">22sp</dimen>
+    <dimen name="text_subheader_size">18sp</dimen>
     <dimen name="padding_main">16dp</dimen>
+    <dimen name="margin_item">2dp</dimen>
+    <dimen name="padding_standard">10dp</dimen>
+    <dimen name="padding_minor">5dp</dimen>
+    <dimen name="margin_standard">10dp</dimen>
+    <dimen name="line_height">1dp</dimen>
+    <dimen name="image_header_height">300dp</dimen>
+    <dimen name="card_elevation">5dp</dimen>
+    <dimen name="header_max">32sp</dimen>
+
 </resources>
