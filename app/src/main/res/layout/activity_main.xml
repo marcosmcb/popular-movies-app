@@ -22,17 +22,13 @@
             android:visibility="invisible" />
 
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:padding="16dp"
+            android:textSize="@dimen/text_header_size"
+            android:padding="@dimen/padding_main"
             android:id="@+id/error_message"
             android:visibility="invisible"
             android:text="@string/error_message" />
-
-
-        
 
 </RelativeLayout>
