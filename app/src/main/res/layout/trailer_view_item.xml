@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/ivMoviePoster"
+        android:id="@+id/iv_trailer_thumbnail"
         android:adjustViewBounds="true"
         android:layout_margin="@dimen/margin_item"
         android:layout_width="match_parent"

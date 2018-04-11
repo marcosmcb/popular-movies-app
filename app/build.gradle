@@ -34,10 +34,6 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:4.2.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.2.0'
 
-
-    // Add PICASSO dependency
-    compile 'com.squareup.picasso:picasso:2.5.2'
-
     // Add RecyclerView Dependency
     compile 'com.android.support:recyclerview-v7:26.1.0'
 

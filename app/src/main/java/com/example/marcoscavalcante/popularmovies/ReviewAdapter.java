@@ -22,7 +22,6 @@ public final class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.Revi
     private int viewHolderCount;
     private ReviewAdapter.OnEntryClickListener mOnEntryClickListener;
 
-
     public interface OnEntryClickListener
     {
         void onEntryClick(View view, int position);
@@ -64,7 +63,6 @@ public final class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.Revi
     @Override
     public void onBindViewHolder(ReviewViewHolder holder, int position)
     {
-
         Review review       = mReviews.get( position );
         Context context     = holder.itemView.getContext();
         View view           = holder.itemView;
@@ -75,8 +73,6 @@ public final class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.Revi
         textViewAuthor.setText( review.getAuthor() );
         textViewContent.setText( review.getContent() );
     }
-
-
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder
     {

@@ -21,7 +21,6 @@ import java.util.Scanner;
 
 public class NetworkUtils
 {
-
     private static final boolean IS_DEBUG            = true;
 
     private static final String TAG                  = NetworkUtils.class.getSimpleName();
@@ -112,6 +111,14 @@ public class NetworkUtils
         Log.v(TAG, "Built URI MovieTraillers = " + url);
 
         return url;
+    }
+
+    public static String getYoutubeVideoThumbnail(String key )
+    {
+        String thumbnailUrl = "https://img.youtube.com/vi/" + key + "/sddefault.jpg";
+        Log.v(TAG, "Built URL MovieTraillers Thumbnail = " + thumbnailUrl);
+
+        return thumbnailUrl;
     }
 
     /**
