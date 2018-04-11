@@ -5,9 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.example.marcoscavalcante.popularmovies.models.Review;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.Target;
 import com.example.marcoscavalcante.popularmovies.models.Trailer;
+import com.example.marcoscavalcante.popularmovies.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
@@ -23,12 +26,13 @@ public final class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.Tr
     private TrailerAdapter.OnEntryClickListener mOnEntryClickListener;
 
 
+
     public interface OnEntryClickListener
     {
         void onEntryClick(View view, int position);
     }
 
-    public void setOnEntryClickListener(TrailerAdapter.OnEntryClickListener onEntryClickListener)
+    public void setOnEntryClickListener(OnEntryClickListener onEntryClickListener)
     {
         mOnEntryClickListener = onEntryClickListener;
     }
@@ -52,7 +56,7 @@ public final class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.Tr
     public TrailerViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.movie_view_item;
+        int layoutIdForListItem = R.layout.trailer_view_item;
         LayoutInflater inflater = LayoutInflater.from( context );
         boolean shouldAttachToParentImmediately = false;
 
@@ -68,6 +72,20 @@ public final class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.Tr
         Trailer trailer     = mTrailers.get( position );
         Context context     = holder.itemView.getContext();
         View view           = holder.itemView;
+
+        ImageView imageView = view.findViewById( R.id.iv_trailer_thumbnail );
+        String youtubeThumbnail   =  NetworkUtils.getYoutubeVideoThumbnail( trailer.getKey() );
+
+        GlideApp
+                .with( context )
+                .load( youtubeThumbnail )
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .placeholder(R.drawable.ic_video_loading)
+                .error(R.drawable.ic_error_loading)
+                .fallback(R.drawable.ic_resource_null)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .into( imageView );
+
     }
 
 

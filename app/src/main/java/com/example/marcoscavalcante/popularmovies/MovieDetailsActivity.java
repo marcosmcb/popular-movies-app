@@ -1,6 +1,6 @@
 package com.example.marcoscavalcante.popularmovies;
 
-import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -63,8 +63,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
 
     private LinearLayoutManager mLayoutManagerReviews;
+    private LinearLayoutManager mLayoutManagerTrailers;
 
     private ReviewAdapter mReviewAdapter;
+    private TrailerAdapter mTrailerAdapter;
 
     private RecyclerView mRecyclerViewReviews;
     private RecyclerView mRecyclerViewTrailers;
@@ -94,16 +96,20 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         mNetworkUtils    = new NetworkUtils( this );
 
         mRecyclerViewReviews = findViewById( R.id.rv_reviews );
+        mRecyclerViewTrailers = findViewById( R.id.rv_trailer );
 
         mReviews = new ArrayList<Review>();
         mTrailers = new ArrayList<Trailer>();
 
         mReviewAdapter = new ReviewAdapter( mReviews );
+        mTrailerAdapter = new TrailerAdapter( mTrailers );
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         setRecyclerViewReviews();
+        setRecyclerViewTrailers();
+        setTrailerAdapterListener();
 
 
         Intent movieDetails = getIntent();
@@ -151,6 +157,30 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
+    private void setRecyclerViewTrailers()
+    {
+        mLayoutManagerTrailers =
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+
+        mRecyclerViewTrailers.setLayoutManager(mLayoutManagerTrailers);
+        mRecyclerViewTrailers.setHasFixedSize(true);
+        mRecyclerViewTrailers.setAdapter( mTrailerAdapter );
+    }
+
+
+    private void setTrailerAdapterListener( )
+    {
+        mTrailerAdapter.setOnEntryClickListener(new TrailerAdapter.OnEntryClickListener()
+        {
+            @Override
+            public void onEntryClick(View view, int position)
+            {
+                String key = mTrailers.get( position ).getKey();
+
+                openYoutube( key );
+            }
+        });
+    }
 
 
     private void setRecyclerViewReviews()
@@ -230,6 +260,18 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         else                mFavouriteButton.setImageResource( R.drawable.ic_fav_not_selected );
     }
 
+
+    private void openYoutube( String key )
+    {
+        Intent youtubeApp = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+        Intent youtubeWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key));
+
+        try {
+            this.getApplicationContext().startActivity(youtubeApp);
+        } catch (ActivityNotFoundException ex) {
+            this.getApplicationContext().startActivity(youtubeWeb);
+        }
+    }
 
     private void shareVideo( String url )
     {
@@ -374,13 +416,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         public void onLoadFinished(Loader<ArrayList<String>> loader, ArrayList<String> data)
         {
 
-            String reviews = data.get(0);
-            String videos  = data.get(1);
+            String reviews   = data.get(0);
+            String trailers  = data.get(1);
 
             try
             {
                 JSONObject reviewsJson = new JSONObject(reviews);
                 JSONArray reviewArray  = reviewsJson.getJSONArray("results");
+
+                JSONObject trailersJson = new JSONObject(trailers);
+                JSONArray trailerArray  = trailersJson.getJSONArray("results");
+
 
                 for (int i = 0; i < reviewArray.length(); i++)
                 {
@@ -391,6 +437,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     mReviews.add( new Review( review ) );
                 }
                 mReviewAdapter.notifyDataSetChanged();
+
+
+                for(int i=0; i < trailerArray.length(); i++)
+                {
+                    JSONObject trailer = trailerArray.getJSONObject(i);
+                    Log.d(TAG, trailer.toString());
+                    mTrailers.add( new Trailer(trailer) );
+                }
+
+                mTrailerAdapter.notifyDataSetChanged();
+
             }
             catch (JSONException e)
             {
