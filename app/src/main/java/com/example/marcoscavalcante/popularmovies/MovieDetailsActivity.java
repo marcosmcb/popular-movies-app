@@ -445,7 +445,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     Log.d(TAG, trailer.toString());
                     mTrailers.add( new Trailer(trailer) );
                 }
-
                 mTrailerAdapter.notifyDataSetChanged();
 
             }

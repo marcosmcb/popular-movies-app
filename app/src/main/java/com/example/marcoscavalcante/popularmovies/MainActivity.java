@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int NUM_COLUMNS_PORTRAIT      = 2;
     private static final int NUM_COLUMNS_LANDSCAPE     = 4;
     private static final int MOVIES_LOADER             = 1;
+    private static final int FAVOURITES_LOADER         = 2;
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
 
 
@@ -229,17 +230,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             case R.id.action_sort_favourites:
 
-                getSupportLoaderManager().restartLoader(12, null, favouriteLoader);
+                getSupportLoaderManager().restartLoader(FAVOURITES_LOADER, null, favouriteLoader);
 
                 break;
-
-            /*
-            default:
-                Toast.makeText( MainActivity.this,
-                        getString(R.string.error_message_menu) + " [" + menuItemThatWasSelected + "]",
-                                 Toast.LENGTH_LONG ).show();
-                break;
-            */
         }
 
         return super.onOptionsItemSelected(item);
@@ -346,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
-        //getSupportLoaderManager().restartLoader()
+        //getSupportLoaderManager().restartLoader(  );
     }
 
 

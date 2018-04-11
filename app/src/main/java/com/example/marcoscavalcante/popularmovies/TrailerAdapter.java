@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public final class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder>
 {
-    private static final String TAG = ReviewAdapter.class.getSimpleName();
+    private static final String TAG = TrailerAdapter.class.getSimpleName();
     private ArrayList<Trailer> mTrailers;
     private int viewHolderCount;
     private TrailerAdapter.OnEntryClickListener mOnEntryClickListener;
