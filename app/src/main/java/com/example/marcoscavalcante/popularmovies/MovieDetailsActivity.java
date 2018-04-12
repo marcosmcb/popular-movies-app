@@ -206,7 +206,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 return true;
 
             case R.id.share_button:
-                shareVideo("youtube");
+                String key = null;
+
+                if (mTrailers != null && mTrailers.size() > 0) key = mTrailers.get( 0 ).getKey();
+
+                if (key != null && !key.isEmpty())  shareVideo( "http://www.youtube.com/watch?v=" + key );
+
                 return true;
 
             default:

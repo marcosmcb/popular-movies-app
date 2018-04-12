@@ -21,7 +21,7 @@ import java.util.Scanner;
 
 public class NetworkUtils
 {
-    private static final boolean IS_DEBUG            = true;
+    private static final boolean IS_DEBUG            = false;
 
     private static final String TAG                  = NetworkUtils.class.getSimpleName();
 

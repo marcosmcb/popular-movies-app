@@ -74,23 +74,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setGridLayoutManager();
         setRecyclerView();
 
-        Class mDbHelperClass = FavouriteDbHelper.class;
 
-
-        Field f = null;
         try {
-            f = mDbHelperClass.getDeclaredField("DATABASE_NAME");
-        } catch (NoSuchFieldException e) {
+            makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        f.setAccessible(true);
-        try {
-            this.deleteDatabase((String)f.get(null));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        getSupportLoaderManager().initLoader(MOVIES_LOADER, null, this);
 
     }
 
@@ -340,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
-        //getSupportLoaderManager().restartLoader(  );
     }
 
 
