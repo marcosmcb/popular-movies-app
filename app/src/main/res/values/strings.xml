@@ -19,5 +19,5 @@
     <string name="movie_json">movie</string>
     <string name="results_json">results</string>
     <string name="mMovies">mMovies</string>
-    <string name="item_selected">ITEM</string>
+    <string name="scroll_position">scrollPosition</string>
 </resources>

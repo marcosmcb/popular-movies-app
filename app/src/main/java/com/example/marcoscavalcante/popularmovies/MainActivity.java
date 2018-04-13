@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private GridLayoutManager mGridLayoutManager;
     private Menu mMenu;
     private URL mMovieDbQueryUrl;
+    private int mGridScrollPosition;
 
 
     private static final int MOVIES_LOADER             = 1;
@@ -73,16 +74,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mMovies           = new ArrayList<>();
         mMovieAdapter     = new MovieAdapter( mMovies );
         mRecyclerView     = findViewById( R.id.rv_movies );
-
         setMovieAdapterListener();
         setGridLayoutManager();
-        setRecyclerView();
-        if(savedInstanceState != null)  {
-            reloadSavedInstance(savedInstanceState);
-            Log.d(TAG,  "RE-loading activity" );
+
+        if( savedInstanceState != null )
+        {
+            mGridScrollPosition = savedInstanceState.getInt(getString(R.string.scroll_position));
+            mMovies = savedInstanceState.getParcelableArrayList(getString(R.string.mMovies));
+            if(mMovies != null) mMovieAdapter = new MovieAdapter(mMovies);
+
+
+            mGridLayoutManager.onRestoreInstanceState( savedInstanceState.getParcelable("grid") );
         }
-        else {
-            Log.d(TAG,  "LOADING activity" );
+        
+
+
+
+        setRecyclerView();
+
+        if(savedInstanceState == null) {
             try {
                 makeTheMovieDBQuery(getString(R.string.sort_most_popular));
             } catch (IOException e) {
@@ -91,16 +101,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("grid_position", mGridLayoutManager.onSaveInstanceState() );
-    }
-
-    private void reloadSavedInstance(Bundle savedInstanceState)
-    {
-        mGridLayoutManager = savedInstanceState.getParcelable("grid_position");
+        mGridScrollPosition = mGridLayoutManager.findFirstCompletelyVisibleItemPosition();
+        outState.putInt( getString(R.string.scroll_position), mGridScrollPosition );
+        outState.putParcelableArrayList( getString(R.string.mMovies), mMovies );
+        outState.putParcelable("grid", mGridLayoutManager.onSaveInstanceState());
     }
 
 
@@ -166,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void setGridLayoutManager()
     {
         mGridLayoutManager = new GridLayoutManager( this , getNumberOfColumns() );
+        mGridLayoutManager.scrollToPosition(mGridScrollPosition);
     }
 
 
