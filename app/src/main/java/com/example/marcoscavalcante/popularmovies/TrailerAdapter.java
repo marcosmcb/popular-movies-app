@@ -1,6 +1,8 @@
 package com.example.marcoscavalcante.popularmovies;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;

@@ -116,11 +116,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
         Intent movieDetails = getIntent();
 
-        if ( movieDetails != null && movieDetails.hasExtra( "movie" ) )
+        if ( movieDetails != null && movieDetails.hasExtra( getString(R.string.movie_json) ) )
         {
             try
             {
-                JSONObject movieJsonObject = new JSONObject( movieDetails.getStringExtra("movie"));
+                JSONObject movieJsonObject = new JSONObject( movieDetails.getStringExtra( getString(R.string.movie_json) ));
                 mMovie = new Movie( movieJsonObject );
 
                 String posterPath;
@@ -210,7 +210,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
                 if (mTrailers != null && mTrailers.size() > 0) key = mTrailers.get( 0 ).getKey();
 
-                if (key != null && !key.isEmpty())  shareVideo( "http://www.youtube.com/watch?v=" + key );
+                if (key != null && !key.isEmpty())  shareVideo( getString(R.string.youtube_url) + key );
 
                 return true;
 
@@ -240,7 +240,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
                         if(movieDeleted != -1)
                         {
-                            Toast.makeText(getBaseContext(), "Movie removed from favourites", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), getString(R.string.movie_removed_fav), Toast.LENGTH_SHORT).show();
                         }
                     }
                     else
@@ -250,7 +250,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
                         if (uri != null)
                         {
-                            Toast.makeText(getBaseContext(), "Movie added to favourites", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), getString(R.string.movie_add_fav), Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -269,8 +269,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void openYoutube( String key )
     {
-        Intent youtubeApp = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
-        Intent youtubeWeb = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key));
+        Intent youtubeApp = new Intent(Intent.ACTION_VIEW, Uri.parse( getString(R.string.youtube_app_uri) + key));
+        Intent youtubeWeb = new Intent(Intent.ACTION_VIEW, Uri.parse( getString(R.string.youtube_url) + key));
 
         try {
             this.getApplicationContext().startActivity(youtubeApp);
@@ -428,10 +428,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             try
             {
                 JSONObject reviewsJson = new JSONObject(reviews);
-                JSONArray reviewArray  = reviewsJson.getJSONArray("results");
+                JSONArray reviewArray  = reviewsJson.getJSONArray(getString(R.string.results_json));
 
                 JSONObject trailersJson = new JSONObject(trailers);
-                JSONArray trailerArray  = trailersJson.getJSONArray("results");
+                JSONArray trailerArray  = trailersJson.getJSONArray(getString(R.string.results_json));
 
                 for (int i = 0; i < reviewArray.length(); i++)
                 {

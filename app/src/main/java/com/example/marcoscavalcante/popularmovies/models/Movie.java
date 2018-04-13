@@ -2,6 +2,9 @@ package com.example.marcoscavalcante.popularmovies.models;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.example.marcoscavalcante.popularmovies.data.FavouriteContract.FavouriteMovieEntry;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +15,7 @@ import java.text.ParseException;
  * Created by marcoscavalcante on 30/12/2017.
  */
 
-public class Movie
+public class Movie implements Parcelable
 {
     private int voteCount;
     private int movieIdDb;
@@ -29,6 +32,80 @@ public class Movie
     private String overview;
     private String releaseDate;
     private JSONObject movieJson;
+
+
+    protected Movie(Parcel in) {
+        voteCount = in.readInt();
+        movieIdDb = in.readInt();
+        id = in.readInt();
+        hasVideo = in.readByte() != 0;
+        if (in.readByte() == 0) {
+            voteAverage = null;
+        } else {
+            voteAverage = in.readDouble();
+        }
+        title = in.readString();
+        if (in.readByte() == 0) {
+            popularity = null;
+        } else {
+            popularity = in.readDouble();
+        }
+        posterPath = in.readString();
+        originalLanguage = in.readString();
+        originalTitle = in.readString();
+        backdropPath = in.readString();
+        isAdult = in.readByte() != 0;
+        overview = in.readString();
+        releaseDate = in.readString();
+
+        movieJson = getMovieJson();
+
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(voteCount);
+        dest.writeInt(movieIdDb);
+        dest.writeInt(id);
+        dest.writeByte((byte) (hasVideo ? 1 : 0));
+        if (voteAverage == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(voteAverage);
+        }
+        dest.writeString(title);
+        if (popularity == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(popularity);
+        }
+        dest.writeString(posterPath);
+        dest.writeString(originalLanguage);
+        dest.writeString(originalTitle);
+        dest.writeString(backdropPath);
+        dest.writeByte((byte) (isAdult ? 1 : 0));
+        dest.writeString(overview);
+        dest.writeString(releaseDate);
+    }
 
 
     public Movie(Cursor movie)
@@ -193,20 +270,24 @@ public class Movie
     }
 
 
-    public JSONObject getMovieJson() throws JSONException
+    public JSONObject getMovieJson()
     {
         if( this.movieJson == null )
         {
             this.movieJson = new JSONObject();
-            this.movieJson.put( "vote_count", this.getVoteCount() );
-            this.movieJson.put( "id", this.getId() );
-            this.movieJson.put( "video", this.hasVideo() );
-            this.movieJson.put( "vote_average", this.getVoteAverage() );
-            this.movieJson.put( "title", this.getTitle() );
-            this.movieJson.put( "popularity", this.getPopularity() );
-            this.movieJson.put("overview", this.getOverview());
-            this.movieJson.put("release_date", this.getReleaseDate());
-            this.movieJson.put("poster_path", this.getPosterPath());
+            try {
+                this.movieJson.put( "vote_count", this.getVoteCount() );
+                this.movieJson.put( "id", this.getId() );
+                this.movieJson.put( "video", this.hasVideo() );
+                this.movieJson.put( "vote_average", this.getVoteAverage() );
+                this.movieJson.put( "title", this.getTitle() );
+                this.movieJson.put( "popularity", this.getPopularity() );
+                this.movieJson.put("overview", this.getOverview());
+                this.movieJson.put("release_date", this.getReleaseDate());
+                this.movieJson.put("poster_path", this.getPosterPath());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         return movieJson;
@@ -219,5 +300,4 @@ public class Movie
     public boolean isHasVideo() {
         return hasVideo;
     }
-
 }

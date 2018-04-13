@@ -3,6 +3,8 @@ package com.example.marcoscavalcante.popularmovies;
 import android.content.Intent;
 
 import android.database.Cursor;
+import android.nfc.Tag;
+import android.os.PersistableBundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -11,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +32,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -35,6 +40,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>
 {
+    private static final String TAG = MainActivity.class.getSimpleName();
     private NetworkUtils mNetworkUtils;
     private TextView mErrorMessage;
     private ProgressBar mLoadingIndicator;
@@ -45,15 +51,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridLayoutManager;
     private Menu mMenu;
+    private URL mMovieDbQueryUrl;
 
 
-    private static final int NUM_COLUMNS_PORTRAIT      = 2;
-    private static final int NUM_COLUMNS_LANDSCAPE     = 4;
     private static final int MOVIES_LOADER             = 1;
     private static final int FAVOURITES_LOADER         = 2;
+    private static final int WIDTH_DIVIDER             = 600;
 
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
-
 
 
     @Override
@@ -69,27 +74,47 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mMovieAdapter     = new MovieAdapter( mMovies );
         mRecyclerView     = findViewById( R.id.rv_movies );
 
-        reloadSavedInstance( savedInstanceState );
         setMovieAdapterListener();
         setGridLayoutManager();
         setRecyclerView();
-
-
-        try {
-            makeTheMovieDBQuery( getString( R.string.sort_most_popular ) );
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(savedInstanceState != null)  {
+            reloadSavedInstance(savedInstanceState);
+            Log.d(TAG,  "RE-loading activity" );
         }
-
+        else {
+            Log.d(TAG,  "LOADING activity" );
+            try {
+                makeTheMovieDBQuery(getString(R.string.sort_most_popular));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("grid_position", mGridLayoutManager.onSaveInstanceState() );
+    }
+
     private void reloadSavedInstance(Bundle savedInstanceState)
     {
-        if(savedInstanceState != null)
-        {
-            String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
-        }
+        mGridLayoutManager = savedInstanceState.getParcelable("grid_position");
+    }
+
+
+    private int getNumberOfColumns()
+    {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / WIDTH_DIVIDER;
+
+        if (nColumns < 2) return 2; //to keep the grid aspect
+
+        return nColumns;
     }
 
     private void setMovieAdapterListener( )
@@ -102,17 +127,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Class movieDetails = MovieDetailsActivity.class;
                 Intent startMovieDetailsActivityIntent = new Intent(MainActivity.this, movieDetails);
 
-                String movieJson = null;
-                try
-                {
-                    movieJson = mMovies.get(position).getMovieJson().toString();
-                }
-                catch (JSONException e)
-                {
-                    e.printStackTrace();
-                }
+                String movieJson = mMovies.get(position).getMovieJson().toString();
 
-                startMovieDetailsActivityIntent.putExtra("movie", movieJson );
+                startMovieDetailsActivityIntent.putExtra(getString(R.string.movie_json), movieJson );
 
                 startActivity(startMovieDetailsActivityIntent);
             }
@@ -128,10 +145,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
 
-    private void callLoader( URL movieQuery )
+    private void callLoader(  )
     {
         Bundle queryBundle = new Bundle();
-        queryBundle.putString( SEARCH_QUERY_URL_EXTRA, movieQuery.toString() );
+        queryBundle.putString( SEARCH_QUERY_URL_EXTRA, mMovieDbQueryUrl.toString() );
 
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> movieLoader = loaderManager.getLoader(MOVIES_LOADER);
@@ -148,33 +165,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void setGridLayoutManager()
     {
-        if( this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT )
-        {
-            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_PORTRAIT);
-        }
-        else
-        {
-            mGridLayoutManager = new GridLayoutManager( this , NUM_COLUMNS_LANDSCAPE);
-        }
+        mGridLayoutManager = new GridLayoutManager( this , getNumberOfColumns() );
     }
 
 
     private void makeTheMovieDBQuery( String param ) throws IOException
     {
-        URL movieDbQueryUrl;
         String popularMovies = getString( R.string.sort_most_popular );
         mMovies.clear();
 
         if( param.equals(popularMovies) )
         {
-            movieDbQueryUrl = mNetworkUtils.getUrlPopularMovies();
+            mMovieDbQueryUrl = mNetworkUtils.getUrlPopularMovies();
         }
         else
         {
-            movieDbQueryUrl = mNetworkUtils.getUrlTopRated();
+            mMovieDbQueryUrl = mNetworkUtils.getUrlTopRated();
         }
 
-        callLoader( movieDbQueryUrl );
+        callLoader( );
     }
 
 
@@ -283,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             try
             {
                 JSONObject jsonObject = new JSONObject(data);
-                JSONArray jsonArray  = jsonObject.getJSONArray("results");
+                JSONArray jsonArray  = jsonObject.getJSONArray( getString(R.string.results_json));
 
                 for( int i=0; i < jsonArray.length(); i++ )
                 {
@@ -322,14 +331,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<String> loader) { }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) { super.onSaveInstanceState(outState); }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
 
     private LoaderManager.LoaderCallbacks<Cursor> favouriteLoader = new LoaderManager.LoaderCallbacks<Cursor>()

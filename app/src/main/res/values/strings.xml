@@ -12,4 +12,12 @@
     <string name="error_message_menu">Couldn\'t find item!</string>
     <string name="sort_favourites">Favourites</string>
     <string name="review_author">Author</string>
+    <string name="youtube_url">http://www.youtube.com/watch?v=</string>
+    <string name="youtube_app_uri">vnd.youtube:</string>
+    <string name="movie_removed_fav">Movie removed from favourites</string>
+    <string name="movie_add_fav">Movie added to favourites</string>
+    <string name="movie_json">movie</string>
+    <string name="results_json">results</string>
+    <string name="mMovies">mMovies</string>
+    <string name="item_selected">ITEM</string>
 </resources>
