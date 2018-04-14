@@ -73,7 +73,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private RecyclerView mRecyclerViewReviews;
     private RecyclerView mRecyclerViewTrailers;
 
-
+    private int mReviewsScrollPosition;
+    private int mTrailersScrollPosition;
 
 
     @Override
@@ -109,10 +110,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        setLayoutManagers();
+
+        if(savedInstanceState != null)
+        {
+            onRestoreInstanceState(savedInstanceState);
+        }
+
+
         setRecyclerViewReviews();
         setRecyclerViewTrailers();
         setTrailerAdapterListener();
-
 
         Intent movieDetails = getIntent();
 
@@ -159,11 +167,52 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    private void setRecyclerViewTrailers()
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        mReviewsScrollPosition  = mLayoutManagerReviews.findFirstCompletelyVisibleItemPosition();
+        mTrailersScrollPosition = mLayoutManagerTrailers.findFirstCompletelyVisibleItemPosition();
+
+        outState.putInt( getString( R.string.scroll_reviews ), mReviewsScrollPosition );
+        outState.putInt( getString(R.string.scroll_trailers), mTrailersScrollPosition );
+
+        outState.putParcelableArrayList( getString(R.string.mReviews), mReviews );
+        outState.putParcelableArrayList( getString(R.string.mTrailers), mTrailers );
+
+        outState.putParcelable( getString(R.string.layout_review), mLayoutManagerReviews.onSaveInstanceState() );
+        outState.putParcelable( getString(R.string.layout_trailer), mLayoutManagerTrailers.onSaveInstanceState() );
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mTrailersScrollPosition = savedInstanceState.getInt( getString(R.string.scroll_trailers) );
+        mReviewsScrollPosition  = savedInstanceState.getInt( getString(R.string.scroll_reviews)  );
+
+        mTrailers = savedInstanceState.getParcelableArrayList( getString(R.string.mTrailers) );
+        mReviews = savedInstanceState.getParcelableArrayList( getString(R.string.mReviews));
+
+        if(mReviews != null)    mReviewAdapter  = new ReviewAdapter( mReviews );
+        if(mTrailers != null)   mTrailerAdapter = new TrailerAdapter( mTrailers );
+
+        mLayoutManagerReviews.onRestoreInstanceState( savedInstanceState.getParcelable( getString(R.string.layout_review) ) );
+        mLayoutManagerTrailers.onRestoreInstanceState( savedInstanceState.getParcelable( getString(R.string.layout_trailer) ) );
+    }
+
+    private void setLayoutManagers( )
     {
         mLayoutManagerTrailers =
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mLayoutManagerReviews =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    }
 
+
+    private void setRecyclerViewTrailers()
+    {
         mRecyclerViewTrailers.setLayoutManager(mLayoutManagerTrailers);
         mRecyclerViewTrailers.setHasFixedSize(true);
         mRecyclerViewTrailers.setAdapter( mTrailerAdapter );
@@ -187,9 +236,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void setRecyclerViewReviews()
     {
-        mLayoutManagerReviews =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
         mRecyclerViewReviews.setLayoutManager(mLayoutManagerReviews);
         mRecyclerViewReviews.setHasFixedSize(true);
         mRecyclerViewReviews.setAdapter( mReviewAdapter );
@@ -441,6 +487,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
                     mReviews.add( new Review( review ) );
                 }
+
+                mRecyclerViewReviews.getLayoutManager().scrollToPosition( mReviewsScrollPosition );
                 mReviewAdapter.notifyDataSetChanged();
 
 
@@ -450,6 +498,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     Log.d(TAG, trailer.toString());
                     mTrailers.add( new Trailer(trailer) );
                 }
+
+                mRecyclerViewTrailers.getLayoutManager().scrollToPosition( mTrailersScrollPosition );
                 mTrailerAdapter.notifyDataSetChanged();
 
             }

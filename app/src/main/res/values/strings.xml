@@ -19,5 +19,15 @@
     <string name="movie_json">movie</string>
     <string name="results_json">results</string>
     <string name="mMovies">mMovies</string>
+    <string name="mTrailers">mTrailers</string>
+    <string name="mReviews">mReviews</string>
     <string name="scroll_position">scrollPosition</string>
+    <string name="scroll_reviews">scrollReviews</string>
+    <string name="scroll_trailers">scrollTrailers</string>
+    <string name="movies_recyclerview">movies_recyclerview</string>
+    <string name="reviews_recyclerview">reviews_recyclerview</string>
+    <string name="trailers_recyclerview">trailers_recyclerview</string>
+    <string name="layout_trailer">layout_trailer</string>
+    <string name="layout_review">layout_review</string>
+    <string name="movies_grid">movies_grid</string>
 </resources>

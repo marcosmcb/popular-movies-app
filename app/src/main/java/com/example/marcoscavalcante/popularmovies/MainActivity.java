@@ -74,22 +74,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mMovies           = new ArrayList<>();
         mMovieAdapter     = new MovieAdapter( mMovies );
         mRecyclerView     = findViewById( R.id.rv_movies );
-        setMovieAdapterListener();
         setGridLayoutManager();
 
         if( savedInstanceState != null )
         {
-            mGridScrollPosition = savedInstanceState.getInt(getString(R.string.scroll_position));
-            mMovies = savedInstanceState.getParcelableArrayList(getString(R.string.mMovies));
-            if(mMovies != null) mMovieAdapter = new MovieAdapter(mMovies);
-
-
-            mGridLayoutManager.onRestoreInstanceState( savedInstanceState.getParcelable("grid") );
+           onRestoreInstanceState(savedInstanceState);
         }
-        
 
-
-
+        setMovieAdapterListener();
         setRecyclerView();
 
         if(savedInstanceState == null) {
@@ -107,9 +99,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mGridScrollPosition = mGridLayoutManager.findFirstCompletelyVisibleItemPosition();
         outState.putInt( getString(R.string.scroll_position), mGridScrollPosition );
         outState.putParcelableArrayList( getString(R.string.mMovies), mMovies );
-        outState.putParcelable("grid", mGridLayoutManager.onSaveInstanceState());
+        outState.putParcelable( getString(R.string.movies_grid), mGridLayoutManager.onSaveInstanceState());
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mGridScrollPosition = savedInstanceState.getInt(getString(R.string.scroll_position));
+        mMovies = savedInstanceState.getParcelableArrayList(getString(R.string.mMovies));
+        if(mMovies != null) mMovieAdapter = new MovieAdapter(mMovies);
+
+
+        mGridLayoutManager.onRestoreInstanceState( savedInstanceState.getParcelable( getString(R.string.movies_grid) ) );
+    }
 
     private int getNumberOfColumns()
     {
@@ -307,6 +309,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     JSONObject movieJson = jsonArray.getJSONObject(i);
                     getmMovies().add( new Movie( movieJson ) );
                 }
+
+                mGridLayoutManager.scrollToPosition( mGridScrollPosition );
 
                 getmMovieAdapter().notifyDataSetChanged();
             }
