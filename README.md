@@ -35,6 +35,7 @@ API_KEY=[YOUR_OWN_KEY]
 ![Main Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen.jpg)
 ![Main Screen Menu](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen_menu.jpg)
 ![Movie Detail Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_detail_screen.jpg)
+![Movie Detail With Trailer](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_detail_with_trailer.jpg)
 ![Movie Added to Favourite](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_added_fav.jpg)
 ![Movie Landscape](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_landscape.jpg)
 
