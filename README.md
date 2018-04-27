@@ -32,11 +32,11 @@ API_KEY=[YOUR_OWN_KEY]
 ```
 
 ## Screenshots
-![Main Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen.jpeg)
-![Main Screen Menu](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen_menu.jpeg)
-![Movie Detail Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_detail_screen.png)
-![Movie Added to Favourite](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_added_fav.jpeg)
-![Movie Landscape](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_landscape.png)
+![Main Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen.jpg)
+![Main Screen Menu](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/main_screen_menu.jpg)
+![Movie Detail Screen](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_detail_screen.jpg)
+![Movie Added to Favourite](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_added_fav.jpg)
+![Movie Landscape](https://github.com/marcosmcb/popular-movies-app/blob/master/screen_shots/movie_landscape.jpg)
 
 
 
